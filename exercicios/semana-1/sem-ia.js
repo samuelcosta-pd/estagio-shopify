@@ -1,4 +1,5 @@
-// Tempo de início: ___:___ (anote aqui)
+// Medi o tempo cronometrando em cada questão. Tempo total SEM IA: 20min e 31s;
+
 // a) inverterString(str)
 // Recebe uma string e retorna ela invertida.
 // Exemplo: "hello" → "olleh"
