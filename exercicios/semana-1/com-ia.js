@@ -1,4 +1,4 @@
-// Medi o tempo cronometrando em cada questão, os comentários também foram considerados no tempo. Tempo total COM IA: 47s;
+// Medi o tempo cronometrando em cada questão, os comentários também foram considerados no tempo. Tempo total COM IA: 2min e 30s com testes, 47s só com a geração de código;
 
 // Função que inverte uma string
 // Exemplo: "hello" → "olleh"
@@ -9,7 +9,12 @@ function inverterString(str) {
 
 console.log(inverterString("Brasil campeão"));
 
-//tempo 8s;
+//crie mais edge cases para testar a função inverterString, como por exemplo, uma string vazia, ou uma string com caracteres especiais.
+
+console.log(inverterString(""));
+console.log(inverterString("!@#$%^&*()"));
+
+//tempo 41s;
 
 // Função que conta as vogais em uma string (maiúsculas e minúsculas)
 // Exemplo: "programacao" → 5
@@ -23,7 +28,12 @@ function contarVogais(str) {
 
 console.log(contarVogais("FortAlEza CEará"));
 
-//tempo 7s;
+//crie mais edge cases para testar a função contarVogais, como por exemplo, uma string sem vogais, ou uma string com apenas vogais.
+
+console.log(contarVogais("bcdfghjklmnpqrstvwxyz"));
+console.log(contarVogais("aeiouAEIOU"));
+
+//tempo 26s;
 
 // Função que encontra o maior número em um array
 // Exemplo: [3, 7, 2, 9, 1] → 9
@@ -36,7 +46,12 @@ function encontrarMaior(numeros) {
 
 console.log(encontrarMaior([1,2,3,4,5]));
 
-//tempo 4s;
+//crie mais edge cases para testar a função encontrarMaior, como por exemplo, um array com números negativos, ou um array com números decimais.
+
+console.log(encontrarMaior([-1, -2, -3, -4, -5]));
+console.log(encontrarMaior([1.5, 2.5, 3.5, 4.5, 5.5]));
+
+//tempo 23s;
 
 // Função que remove valores duplicados de um array
 // Exemplo: [1, 2, 2, 3, 3, 4] → [1, 2, 3, 4]
@@ -57,6 +72,11 @@ function removerDuplicatas(array) {
 
 console.log(removerDuplicatas([1, 2, 2, 3, 3, 4]));
 
-//tempo 28s;
+//crie mais edge cases para testar a função removerDuplicatas, como por exemplo, um array de strings com valores duplicados, ou um array de números com valores duplicados.
 
-// Tempo total COM IA: 47s
+console.log(removerDuplicatas(["a", "b", "a", "c"]));
+console.log(removerDuplicatas([1, 1, 2, 3, 4, 4, 5]));
+
+//tempo 1min;
+
+// Tempo total COM IA: 2min e 30s com testes, 47s só com a geração de código;
