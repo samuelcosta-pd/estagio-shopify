@@ -63,6 +63,29 @@
       c) Se o produto estiver disponível e NÃO for promoção:
         - Mostrar badge "Disponível" com classe "badge-disponivel"
     {%- endcomment -%}
+
+     {%- comment -%}
+      TAREFA 3: Usar assign e capture
+
+      a) assign — Criar uma variável que conte quantos produtos estão em promoção:
+
+      - Antes do loop, inicializar:
+        {% assign produtos_em_promocao = 0 %}
+
+      - Dentro do loop, incrementar quando for promoção
+
+      - Após o loop, exibir:
+        "X produtos em promoção"
+
+      b) capture — Montar um texto resumo dinâmico:
+
+      {% capture resumo %}
+        A coleção "{{ colecao.title }}" tem {{ colecao.products.size }} produtos,
+        sendo {{ produtos_em_promocao }} em promoção.
+      {% endcapture %}
+
+      - Exibir o resumo em um <p> com classe "resumo"
+    {%- endcomment -%}
      
         <div class="produtos-container">
         {% assign produtos_em_promocao = 0 %}
@@ -98,32 +121,6 @@
         {% endcapture %}
 
         <p class="resumo">{{ resumo }}</p>
-
-    
-
-
-    {%- comment -%}
-      TAREFA 3: Usar assign e capture
-
-      a) assign — Criar uma variável que conte quantos produtos estão em promoção:
-
-      - Antes do loop, inicializar:
-        {% assign produtos_em_promocao = 0 %}
-
-      - Dentro do loop, incrementar quando for promoção
-
-      - Após o loop, exibir:
-        "X produtos em promoção"
-
-      b) capture — Montar um texto resumo dinâmico:
-
-      {% capture resumo %}
-        A coleção "{{ colecao.title }}" tem {{ colecao.products.size }} produtos,
-        sendo {{ produtos_em_promocao }} em promoção.
-      {% endcapture %}
-
-      - Exibir o resumo em um <p> com classe "resumo"
-    {%- endcomment -%}
 
   {% else %}
     <p class="sem-colecao">
