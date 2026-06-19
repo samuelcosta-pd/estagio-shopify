@@ -18,11 +18,11 @@ O Copilot me ajudou a identificar oportunidades de simplificação, tornando o c
 
 ### Antes
 
-*Inserir imagem do código refatorado.*
+<img width="1037" height="513" alt="image" src="https://github.com/user-attachments/assets/67440c06-7abd-4e47-9e8f-56c3def4ed4f" />
 
 ### Depois
 
-*Inserir imagem do código refatorado.*
+<img width="3611" height="1356" alt="image" src="https://github.com/user-attachments/assets/1ea8d2dd-00ed-4f4a-95d2-37b7a3832106" />
 
 ## Desafio 2.3
 
@@ -34,4 +34,5 @@ O objetivo não foi apenas obter uma solução pronta, mas utilizar a ferramenta
 
 ### Exemplo
 
-*Inserir imagem do trecho de código e/ou da interação utilizada para compreender a solução proposta.*
+<img width="4011" height="1377" alt="image" src="https://github.com/user-attachments/assets/fc7b96d4-b363-4c8b-887d-09ab5459dadb" />
+
