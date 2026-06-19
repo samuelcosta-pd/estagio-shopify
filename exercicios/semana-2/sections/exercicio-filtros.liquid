@@ -89,30 +89,53 @@
      
         <div class="produtos-container">
         {% assign produtos_em_promocao = 0 %}
+
+        {%- comment -%} Primeiro: produtos em promoção (disponíveis com compare_at_price > price) {%- endcomment -%}
         {% for produto in colecao.products %}
+          {% if produto.available and produto.compare_at_price and produto.compare_at_price > produto.price %}
             <div class="produto-card">
-            {% comment %} Badges: esgotado > promocao > disponivel {% endcomment %}
-            {% if produto.available == false %}
-              <span class="badge-esgotado">Esgotado</span>
-            {% elsif produto.compare_at_price and produto.compare_at_price > produto.price %}
               {% assign diff = produto.compare_at_price | minus: produto.price %}
               {% assign desconto = diff | times: 100 | divided_by: produto.compare_at_price | floor %}
               {% assign produtos_em_promocao = produtos_em_promocao | plus: 1 %}
               <span class="badge-promocao">Em promoção</span>
-            {% else %}
-              <span class="badge-disponivel">Disponível</span>
-            {% endif %}
 
-            <img src="{{ produto.featured_image | image_url: width: 300 }}" alt="{{ produto.title }}" width="300" height="300">
-            <h3>{{ produto.title | capitalize }}</h3>
-            <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
-            <p class="preco">
-              {{ produto.price | money }}
-              {% if produto.compare_at_price and produto.compare_at_price > produto.price %}
+              <img src="{{ produto.featured_image | image_url: width: 300 }}" alt="{{ produto.title }}" width="300" height="300">
+              <h3>{{ produto.title | capitalize }}</h3>
+              <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
+              <p class="preco">
+                {{ produto.price | money }}
                 <span class="preco-original"><s>{{ produto.compare_at_price | money }}</s> - {{ desconto }}%</span>
-              {% endif %}
-            </p>
+              </p>
             </div>
+          {% endif %}
+        {% endfor %}
+
+        {%- comment -%} Depois: os demais produtos (inclui esgotados e disponíveis sem promoção) {%- endcomment -%}
+        {% for produto in colecao.products %}
+          {% unless produto.available and produto.compare_at_price and produto.compare_at_price > produto.price %}
+            <div class="produto-card">
+              {% comment %} Badges: esgotado > promocao > disponivel {% endcomment %}
+              {% if produto.available == false %}
+                <span class="badge-esgotado">Esgotado</span>
+              {% elsif produto.compare_at_price and produto.compare_at_price > produto.price %}
+                {% assign diff = produto.compare_at_price | minus: produto.price %}
+                {% assign desconto = diff | times: 100 | divided_by: produto.compare_at_price | floor %}
+                <span class="badge-promocao">Em promoção</span>
+              {% else %}
+                <span class="badge-disponivel">Disponível</span>
+              {% endif %}
+
+              <img src="{{ produto.featured_image | image_url: width: 300 }}" alt="{{ produto.title }}" width="300" height="300">
+              <h3>{{ produto.title | capitalize }}</h3>
+              <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
+              <p class="preco">
+                {{ produto.price | money }}
+                {% if produto.compare_at_price and produto.compare_at_price > produto.price %}
+                  <span class="preco-original"><s>{{ produto.compare_at_price | money }}</s> - {{ desconto }}%</span>
+                {% endif %}
+              </p>
+            </div>
+          {% endunless %}
         {% endfor %}
         </div>
 
@@ -168,24 +191,28 @@
 
   .produto-card h3 {
     margin: 0.75rem 0 0.25rem;
-    font-size: 1rem;
+    font-size: 2rem;
   }
 
   .produto-card .descricao {
-    font-size: 0.85rem;
+    font-size: 1.25rem;
     color: #666;
-    margin-bottom: 0.5rem;
+    margin-bottom: 4.2rem;
   }
 
   .produto-card .preco {
+    position: absolute;
+    bottom: 12px;
+    left: 16px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 2rem;
     color: #333;
+    margin: 0;
   }
 
   .produto-card .preco-original {
     color: #999;
-    font-size: 0.9rem;
+    font-size: 1.25rem;
     margin-left: 0.5rem;
   }
 
@@ -197,7 +224,7 @@
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
@@ -209,7 +236,7 @@
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
@@ -221,7 +248,7 @@
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
