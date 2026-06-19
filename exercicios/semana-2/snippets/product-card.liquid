@@ -16,6 +16,8 @@
 <style>
   .product-card{border:1px solid #e6e6e6;border-radius:8px;overflow:hidden;padding:12px;background:#fff;transition:box-shadow .18s ease}
   .product-card:hover{box-shadow:0 6px 18px rgba(0,0,0,.08)}
+  /* Fade-in animation when section loads */
+  .product-card{opacity:0;transform:translateY(6px);animation:product-card-fade .35s ease forwards}
   /* Ensure all preview images share the same visible height by forcing a square media
       container and letting the image cover it. */
   .product-card__media{position:relative;aspect-ratio:1/1;overflow:hidden}
@@ -31,6 +33,11 @@
   .product-card__btn{display:inline-block;margin-top:10px;padding:8px 12px;background:#111;color:#fff;border-radius:6px;text-decoration:none}
   .product-card__btn[disabled],.product-card__btn.disabled{background:#bbb;cursor:not-allowed}
   .product-card__actions{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .product-card__swatches{display:flex;gap:8px;margin-top:8px}
+  .product-card__swatch{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,0.06);cursor:default;display:inline-block}
+  .product-card__swatch--label{display:flex;align-items:center;justify-content:center;font-size:10px;color:#333;background:#eee}
+
+  @keyframes product-card-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 
 <div class="product-card">
@@ -76,6 +83,61 @@
 
   <div class="product-card__content">
     <h3 class="product-card__title"><a href="{{ product.url }}" title="{{ product.title | escape }}">{{ product.title | escape }}</a></h3>
+
+    {%- comment -%} Render color variants as swatches if product has a color option {%- endcomment -%}
+    {%- assign color_option = nil -%}
+    {%- assign color_option_position = 0 -%}
+    {%- for opt in product.options_with_values -%}
+      {%- assign name_down = opt.name | downcase -%}
+      {%- if name_down contains 'color' or name_down contains 'cor' -%}
+        {%- assign color_option = opt -%}
+        {%- assign color_option_position = forloop.index -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {% if color_option and color_option.values.size > 0 %}
+      <div class="product-card__swatches" aria-hidden="true">
+        {% for v in color_option.values limit:6 %}
+          {% assign v_trim = v | strip %}
+
+          {%- comment -%} Find a variant that matches this color value to link directly to it {% endcomment -%}
+          {%- assign variant_id = nil -%}
+          {%- assign variant_available = true -%}
+          {%- for var in product.variants -%}
+            {%- assign match = false -%}
+            {%- if color_option_position == 1 and var.option1 == v_trim -%}
+              {%- assign match = true -%}
+            {%- elsif color_option_position == 2 and var.option2 == v_trim -%}
+              {%- assign match = true -%}
+            {%- elsif color_option_position == 3 and var.option3 == v_trim -%}
+              {%- assign match = true -%}
+            {%- endif -%}
+            {%- if match -%}
+              {%- assign variant_id = var.id -%}
+              {%- assign variant_available = var.available -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {%- comment -%} If value looks like a hex code, use it directly; otherwise try as color name {% endcomment -%}
+          {% if v_trim contains '#' %}
+            {% assign swatch_color = v_trim %}
+          {% else %}
+            {% assign swatch_color = v_trim | downcase %}
+          {% endif %}
+
+          {% if variant_id %}
+            <a href="{{ product.url }}?variant={{ variant_id }}" class="product-card__swatch-link" title="{{ v_trim | escape }}" aria-label="{{ v_trim | escape }}">
+              <span class="product-card__swatch{% unless variant_available %} product-card__swatch--sold{% endunless %}" style="background-color: {{ swatch_color }}"></span>
+            </a>
+          {% else %}
+            <span class="product-card__swatch" title="{{ v_trim | escape }}" style="background-color: {{ swatch_color }}"></span>
+          {% endif %}
+
+        {% endfor %}
+      </div>
+    {% endif %}
 
     <div class="product-card__actions">
       <div>
