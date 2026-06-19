@@ -44,6 +44,13 @@ Estagiário: [seu nome]
       ],
       "default": "grid"
     }
+    ,
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de fundo",
+      "default": "#ffffff"
+    }
   ],
   "presets": [
     {
@@ -53,7 +60,7 @@ Estagiário: [seu nome]
 }
 {% endschema %}
 
-<section class="exercicio-basico">
+<section class="exercicio-basico" style="background-color: {{ section.settings.bg_color }};">
 
   {%- comment -%}
   TAREFA 1: Exibir o título usando a setting
