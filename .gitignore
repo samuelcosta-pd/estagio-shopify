@@ -1,0 +1,12 @@
+# Arquivos de configuração da Shopify (Tokens, senhas e chaves de API)
+.shopify-cli.yml
+config.yml
+.env
+theme.update
+
+# Pastas de dependências (caso venha a usar Node.js no frontend do tema)
+node_modules/
+
+# Arquivos gerados pelo sistema operacional
+.DS_Store
+Thumbs.db
