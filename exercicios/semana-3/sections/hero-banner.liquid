@@ -57,6 +57,120 @@
   "blocks": [
     // TODO: Implemente os 4 tipos de blocks aqui
     // heading, paragraph, button, image
+    //implemente um clock em que tenha um heading um Bloco de título que contém Texto do título (text), Tamanho (select: h1, h2, h3) e Cor do texto (color);
+    {
+      "type": "heading",
+      "name": "Título",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto_titulo",
+          "label": "Texto do título"
+        },
+        {
+          "type": "select",
+          "id": "tamanho_titulo",
+          "label": "Tamanho do título",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "color",
+          "id": "cor_titulo",
+          "label": "Cor do texto"
+        }
+      ]
+    },
+    //implemente um Bloco de parágrafo que contenha Conteúdo (richtext) e Cor do texto (color);
+    {
+      "type": "paragraph",
+      "name": "Parágrafo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "conteudo_paragrafo",
+          "label": "Conteúdo"
+        },
+        {
+          "type": "color",
+          "id": "cor_paragrafo",
+          "label": "Cor do texto"
+        }
+      ]
+    },
+    //implemente um Bloco de botão Texto do botão (text) que contenha um Link (url) e Estilo (select: primário/preenchido, secundário/contorno)
+    {
+      "type": "button",
+      "name": "Botão",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto_botao",
+          "label": "Texto do botão"
+        },
+        {
+          "type": "url",
+          "id": "link_botao",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "estilo_botao",
+          "label": "Estilo do botão",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primário/Preenchido"
+            },
+            {
+              "value": "secondary",
+              "label": "Secundário/Contorno"
+            }
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    //implemente um Bloco de imagem com Imagem (image_picker), Largura máxima (range: 50-400px) e Alt text (text).
+    {
+      "type": "image",
+      "name": "Imagem",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "imagem",
+          "label": "Imagem"
+        },
+        {
+          "type": "range",
+          "id": "largura_maxima",
+          "label": "Largura máxima",
+          "min": 50,
+          "max": 400,
+          "step": 10,
+          "default": 200,
+          "unit": "px"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
   ],
   "presets": [
     {
@@ -70,9 +184,298 @@
         },
         {
           "type": "button"
+        },
+        {
+          "type": "image"
         }
       ]
     }
   ]
 }
 {% endschema %}
+
+<section
+  class="hero-banner"
+  style="min-height: {{ section.settings.altura_minima }}px;"
+>
+  {% if section.settings.imagem_fundo != blank %}
+    <img
+      class="hero-banner__background-image"
+      src="{{ section.settings.imagem_fundo | image_url: width: 1920 }}"
+      alt=""
+      loading="eager"
+      fetchpriority="high"
+    >
+  {% endif %}
+
+  <div
+    class="hero-banner__overlay"
+    style="
+      background-color: {{ section.settings.cor_overlay }};
+      opacity: {{ section.settings.opacidade_overlay | divided_by: 100.0 }};
+    "
+  >
+    ""
+  </div>
+
+  <div class="hero-banner__content hero-banner__content--{{ section.settings.alinhamento }}">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'heading' %}
+          <div
+            class="hero-banner__heading"
+            {{ block.shopify_attributes }}
+          >
+            <{{ block.settings.tamanho_titulo }}
+              style="color: {{ block.settings.cor_titulo }};"
+            >
+              {{ block.settings.texto_titulo }}
+            </{{ block.settings.tamanho_titulo }}>
+          </div>
+
+        {% when 'paragraph' %}
+          <div
+            class="hero-banner__paragraph"
+            {{ block.shopify_attributes }}
+            style="color: {{ block.settings.cor_paragrafo }};"
+          >
+            {{ block.settings.conteudo_paragrafo }}
+          </div>
+
+        {% when 'button' %}
+          <div
+            class="hero-banner__button"
+            {{ block.shopify_attributes }}
+          >
+            <a
+              href="{{ block.settings.link_botao }}"
+              class="button button--{{ block.settings.estilo_botao }}"
+            >
+              {{ block.settings.texto_botao }}
+            </a>
+          </div>
+
+        {% when 'image' %}
+          <div
+            class="hero-banner__image"
+            style="max-width: {{ block.settings.largura_maxima }}px;"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.imagem != blank %}
+              {{
+                block.settings.imagem
+                | image_url: width: 1200
+                | image_tag: alt: block.settings.alt_text
+              }}
+            {% endif %}
+          </div>
+      {% endcase %}
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  .hero-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 4rem 2rem;
+  }
+
+  .hero-banner__background-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  .hero-banner__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-banner__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /*Alinhamento dinâmico*/
+
+  .hero-banner__content--left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-banner__content--center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-banner__content--right {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /*heading*/
+
+  .hero-banner__heading h1,
+  .hero-banner__heading h2,
+  .hero-banner__heading h3 {
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .hero-banner__heading h1 {
+    font-size: 3.5rem;
+  }
+
+  .hero-banner__heading h2 {
+    font-size: 2.5rem;
+  }
+
+  .hero-banner__heading h3 {
+    font-size: 2rem;
+  }
+
+  /*paragraph*/
+
+  .hero-banner__paragraph {
+    max-width: 700px;
+    font-size: 1.8rem;
+    line-height: 1.7;
+  }
+
+  .hero-banner__paragraph p {
+    margin: 0;
+  }
+
+  /*button*/
+
+  .hero-banner__button {
+    display: flex;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0.875rem 1.75rem;
+
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  /*primary*/
+
+  .button--primary {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  .button--primary:hover {
+    background-color: transparent;
+    color: #ffffff;
+  }
+
+  /*secondary*/
+
+  .button--secondary {
+    background-color: transparent;
+    color: #ffffff;
+  }
+
+  .button--secondary:hover {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  /*image*/
+
+  .hero-banner__image {
+    width: 100%;
+  }
+
+  .hero-banner__image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4%;
+  }
+
+  /*responsive*/
+
+  @media (max-width: 991px) {
+    .hero-banner {
+      padding: 3rem 1.5rem;
+    }
+
+    .hero-banner__heading h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-banner__heading h2 {
+      font-size: 2rem;
+    }
+
+    .hero-banner__heading h3 {
+      font-size: 1.75rem;
+    }
+
+    .hero-banner__paragraph {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hero-banner {
+      padding: 2.5rem 1rem;
+    }
+
+    .hero-banner__content {
+      gap: 1rem;
+    }
+
+    .hero-banner__heading h1 {
+      font-size: 2rem;
+    }
+
+    .hero-banner__heading h2 {
+      font-size: 1.75rem;
+    }
+
+    .hero-banner__heading h3 {
+      font-size: 1.5rem;
+    }
+
+    .button {
+      width: 100%;
+    }
+
+    .hero-banner__button {
+      width: 100%;
+    }
+
+    .hero-banner__image img {
+      max-width: 100%;
+    }
+  }
+</style>
