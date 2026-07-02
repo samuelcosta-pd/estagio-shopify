@@ -1,0 +1,170 @@
+{%- comment -%}
+  sections/product-extra-info.liquid
+{%- endcomment -%}
+
+{% schema %}
+{
+  "name": "Informações Extras",
+  "settings": [
+    {
+      "type": "text",
+      "id": "titulo",
+      "label": "Título da seção",
+      "default": "Informações do Produto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Informações Extras",
+      "category": "product"
+    }
+  ]
+}
+{% endschema %}
+
+{% assign material = product.metafields.custom.material.value %}
+{% assign cuidados = product.metafields.custom.instrucoes_cuidado.value %}
+{% assign video = product.metafields.custom.video_url.value %}
+
+{% if material != blank or cuidados != blank or video != blank %}
+
+<section class="product-extra-info page-width">
+  <div class="product-extra-info__wrapper">
+
+    <h2 class="product-extra-info__title">
+      {{ section.settings.titulo }}
+    </h2>
+
+    {%- comment -%}
+      MATERIAL
+    {%- endcomment -%}
+    {% if material != blank %}
+      <div class="product-extra-info__card">
+        <div class="product-extra-info__row">
+          <span class="product-extra-info__icon">🧵</span>
+          <div>
+            <strong>Material</strong>
+            <p>{{ material }}</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%}
+      INSTRUÇÕES DE CUIDADO
+    {%- endcomment -%}
+    {% if cuidados != blank %}
+      <details class="product-extra-info__accordion">
+        <summary>
+          🧼 Instruções de cuidado
+        </summary>
+
+        <div class="product-extra-info__content">
+          {{ cuidados | metafield_tag }}
+        </div>
+      </details>
+    {% endif %}
+
+    {%- comment -%}
+      VÍDEO
+    {%- endcomment -%}
+    {% if video != blank %}
+
+      {% assign embed_url = video
+        | replace: "https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/"
+        | replace: "https://youtu.be/", "https://www.youtube.com/embed/"
+      %}
+
+      <div class="product-extra-info__video">
+        <iframe
+          src="{{ embed_url }}"
+          title="Vídeo do produto"
+          loading="lazy"
+          allowfullscreen
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+{% endif %}
+
+<style>
+.product-extra-info{
+  margin-top:48px;
+}
+
+.product-extra-info__wrapper{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  padding:24px;
+  background:#fff;
+}
+
+.product-extra-info__title{
+  margin:0 0 24px;
+}
+
+.product-extra-info__card{
+  padding:16px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:10px;
+  margin-bottom:18px;
+}
+
+.product-extra-info__row{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.product-extra-info__icon{
+  font-size:24px;
+  line-height:1;
+}
+
+.product-extra-info__row p{
+  margin:4px 0 0;
+}
+
+.product-extra-info__accordion{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:10px;
+  margin-bottom:24px;
+  overflow:hidden;
+}
+
+.product-extra-info__accordion summary{
+  cursor:pointer;
+  padding:16px;
+  font-weight:600;
+  list-style:none;
+}
+
+.product-extra-info__accordion summary::-webkit-details-marker{
+  display:none;
+}
+
+.product-extra-info__content{
+  padding:0 16px 16px;
+}
+
+.product-extra-info__video{
+  position:relative;
+  padding-bottom:56.25%;
+  height:0;
+  overflow:hidden;
+  border-radius:12px;
+}
+
+.product-extra-info__video iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+</style>
