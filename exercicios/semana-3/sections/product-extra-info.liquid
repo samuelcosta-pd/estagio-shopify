@@ -1,7 +1,3 @@
-{%- comment -%}
-  sections/product-extra-info.liquid
-{%- endcomment -%}
-
 {% schema %}
 {
   "name": "Informações Extras",
@@ -18,15 +14,25 @@
       "name": "Informações Extras",
       "category": "product"
     }
-  ]
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
 }
 {% endschema %}
 
-{% assign material = product.metafields.custom.material.value %}
-{% assign cuidados = product.metafields.custom.instrucoes_cuidado.value %}
-{% assign video = product.metafields.custom.video_url.value %}
+{% if product %}
+  {% assign material = product.metafields.custom.material.value %}
+  {% assign cuidados = product.metafields.custom.instrucoes_cuidado.value %}
+  {% assign video = product.metafields.custom.video_url.value %}
+{% endif %}
 
-{% if material != blank or cuidados != blank or video != blank %}
+{% assign editor_preview = false %}
+{% if request.design_mode and material == blank and cuidados == blank and video == blank %}
+  {% assign editor_preview = true %}
+{% endif %}
+
+{% if material != blank or cuidados != blank or video != blank or editor_preview %}
 
 <section class="product-extra-info page-width">
   <div class="product-extra-info__wrapper">
@@ -35,44 +41,50 @@
       {{ section.settings.titulo }}
     </h2>
 
-    {%- comment -%}
-      MATERIAL
-    {%- endcomment -%}
-    {% if material != blank %}
+    {% if editor_preview %}
+      <p class="product-extra-info__hint">
+        Preencha os metafields "material", "instrucoes_cuidado" e/ou "video_url"
+        do produto para exibir o conteúdo real aqui. Esta é apenas uma prévia.
+      </p>
+    {% endif %}
+
+    {%- comment -%} material {%- endcomment -%}
+    {% if material != blank or editor_preview %}
       <div class="product-extra-info__card">
         <div class="product-extra-info__row">
           <span class="product-extra-info__icon">🧵</span>
           <div>
             <strong>Material</strong>
-            <p>{{ material }}</p>
+            <p>{{ material | default: "Ex.: 100% algodão" }}</p>
           </div>
         </div>
       </div>
     {% endif %}
 
-    {%- comment -%}
-      INSTRUÇÕES DE CUIDADO
-    {%- endcomment -%}
-    {% if cuidados != blank %}
+    {%- comment -%} instrucoes de cuidado {%- endcomment -%}
+    {% if cuidados != blank or editor_preview %}
       <details class="product-extra-info__accordion">
         <summary>
           🧼 Instruções de cuidado
         </summary>
 
         <div class="product-extra-info__content">
-          {{ cuidados | metafield_tag }}
+          {% if cuidados != blank %}
+            {{ cuidados | metafield_tag }}
+          {% else %}
+            <p>Ex.: Lavar à mão, não usar alvejante.</p>
+          {% endif %}
         </div>
       </details>
     {% endif %}
 
-    {%- comment -%}
-      VÍDEO
-    {%- endcomment -%}
+    {%- comment -%} video {%- endcomment -%}
     {% if video != blank %}
 
       {% assign embed_url = video
         | replace: "https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/"
         | replace: "https://youtu.be/", "https://www.youtube.com/embed/"
+        | replace: "https://vimeo.com/", "https://player.vimeo.com/video/"
       %}
 
       <div class="product-extra-info__video">
@@ -86,6 +98,10 @@
         </iframe>
       </div>
 
+    {% elsif editor_preview %}
+      <div class="product-extra-info__video product-extra-info__video--empty">
+        <p>🎬 Nenhum vídeo cadastrado no metafield "video_url".</p>
+      </div>
     {% endif %}
 
   </div>
@@ -107,6 +123,16 @@
 
 .product-extra-info__title{
   margin:0 0 24px;
+}
+
+.product-extra-info__hint{
+  margin:-8px 0 20px;
+  padding:10px 14px;
+  background:#fff8e1;
+  border:1px solid #f0d98c;
+  border-radius:8px;
+  font-size:13px;
+  color:#6b5900;
 }
 
 .product-extra-info__card{
@@ -166,5 +192,16 @@
   inset:0;
   width:100%;
   height:100%;
+}
+
+.product-extra-info__video--empty{
+  position:static;
+  height:auto;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f4f4;
+  color:#666;
 }
 </style>
