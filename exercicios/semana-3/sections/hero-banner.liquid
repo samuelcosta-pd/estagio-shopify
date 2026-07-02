@@ -55,9 +55,6 @@
     }
   ],
   "blocks": [
-    // TODO: Implemente os 4 tipos de blocks aqui
-    // heading, paragraph, button, image
-    //implemente um clock em que tenha um heading um Bloco de título que contém Texto do título (text), Tamanho (select: h1, h2, h3) e Cor do texto (color);
     {
       "type": "heading",
       "name": "Título",
@@ -94,7 +91,6 @@
         }
       ]
     },
-    //implemente um Bloco de parágrafo que contenha Conteúdo (richtext) e Cor do texto (color);
     {
       "type": "paragraph",
       "name": "Parágrafo",
@@ -111,7 +107,6 @@
         }
       ]
     },
-    //implemente um Bloco de botão Texto do botão (text) que contenha um Link (url) e Estilo (select: primário/preenchido, secundário/contorno)
     {
       "type": "button",
       "name": "Botão",
@@ -144,7 +139,6 @@
         }
       ]
     },
-    //implemente um Bloco de imagem com Imagem (image_picker), Largura máxima (range: 50-400px) e Alt text (text).
     {
       "type": "image",
       "name": "Imagem",
@@ -203,6 +197,8 @@
       class="hero-banner__background-image"
       src="{{ section.settings.imagem_fundo | image_url: width: 1920 }}"
       alt=""
+      width="{{ section.settings.imagem_fundo.width }}"
+      height="{{ section.settings.imagem_fundo.height }}"
       loading="eager"
       fetchpriority="high"
     >
