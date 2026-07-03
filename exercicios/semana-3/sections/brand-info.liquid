@@ -1,11 +1,27 @@
 {%- comment -%} sections/brand-info.liquid {%- endcomment -%}
-{%- assign marca = product.metafields.custom.marca.value -%}
-{%- if marca -%}
+{% if product %}
+  {% assign marca = product.metafields.custom.marca.value %}
+{% endif %}
+
+{% assign editor_preview = false %}
+{% if request.design_mode and marca == blank %}
+  {% assign editor_preview = true %}
+{% endif %}
+
+{% if marca != blank or editor_preview %}
 
 <section class="brand-info page-width">
   <div class="brand-info__wrapper">
 
     <h2 class="brand-info__titulo">{{ section.settings.titulo }}</h2>
+
+    {% if editor_preview %}
+      <p class="brand-info__hint">
+        Este produto ainda não possui uma marca vinculada no metafield "marca"
+        (product.metafields.custom.marca). Associe um metaobject de marca para
+        exibir o conteúdo real aqui. Esta é apenas uma prévia.
+      </p>
+    {% endif %}
 
     <div class="brand-info__card">
 
@@ -23,22 +39,31 @@
               height="120"
             >
           </div>
+        {%- elsif editor_preview -%}
+          <div class="brand-info__logo-box brand-info__logo-box--placeholder">
+            <span class="brand-info__icon">🏷️</span>
+          </div>
         {%- endif -%}
-        {%- if marca.nome -%}
-          <h3 class="brand-info__nome">{{ marca.nome }}</h3>
+
+        {%- if marca.nome or editor_preview -%}
+          <h3 class="brand-info__nome">{{ marca.nome | default: "Ex.: Nome da Marca" }}</h3>
         {%- endif -%}
-        {%- if marca.pais_origem -%}
-          <p class="brand-info__origem">Origem: {{ marca.pais_origem }}</p>
+
+        {%- if marca.pais_origem or editor_preview -%}
+          <p class="brand-info__origem">Origem: {{ marca.pais_origem | default: "Ex.: Brasil" }}</p>
         {%- endif -%}
       </div>
 
       {%- comment -%} coluna direita: descrição + link {%- endcomment -%}
-      {%- if marca.descricao or marca.site -%}
+      {%- if marca.descricao or marca.site or editor_preview -%}
         <div class="brand-info__detalhes">
-          {%- if marca.descricao -%}
+          {%- if marca.descricao or editor_preview -%}
             <h4 class="brand-info__descricao-titulo">Descrição</h4>
-            <p class="brand-info__descricao">{{ marca.descricao }}</p>
+            <p class="brand-info__descricao">
+              {{ marca.descricao | default: "Ex.: Uma breve descrição sobre a marca, sua história e seus diferenciais." }}
+            </p>
           {%- endif -%}
+
           {%- if marca.site -%}
             <a
               href="{{ marca.site }}"
@@ -48,6 +73,10 @@
             >
               Visitar site da marca →
             </a>
+          {%- elsif editor_preview -%}
+            <span class="brand-info__link brand-info__link--placeholder">
+              Visitar site da marca →
+            </span>
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -56,6 +85,8 @@
 
   </div>
 </section>
+
+{% endif %}
 
 <style>
 .brand-info{
@@ -71,6 +102,16 @@
 
 .brand-info__titulo{
   margin:0 0 24px;
+}
+
+.brand-info__hint{
+  margin:-8px 0 20px;
+  padding:10px 14px;
+  background:#fff8e1;
+  border:1px solid #f0d98c;
+  border-radius:8px;
+  font-size:13px;
+  color:#6b5900;
 }
 
 .brand-info__card{
@@ -98,6 +139,16 @@
   border-radius:16px;
   overflow:hidden;
   background:#fff;
+}
+
+.brand-info__logo-box--placeholder{
+  background:#f4f4f4;
+  border-style:dashed;
+}
+
+.brand-info__icon{
+  font-size:32px;
+  line-height:1;
 }
 
 .brand-info__logo{
@@ -155,6 +206,15 @@
   text-decoration:underline;
 }
 
+.brand-info__link--placeholder{
+  color:#999;
+  cursor:default;
+}
+
+.brand-info__link--placeholder:hover{
+  text-decoration:none;
+}
+
 @media screen and (max-width:599px){
   .brand-info__card{
     grid-template-columns:1fr;
@@ -171,7 +231,6 @@
   }
 }
 </style>
-{%- endif -%}
 
 {% schema %}
 {
