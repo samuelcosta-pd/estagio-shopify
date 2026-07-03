@@ -189,7 +189,7 @@
 {% endschema %}
 
 <section
-  class="hero-banner"
+  class="hero-banner{% if section.settings.imagem_fundo == blank %} hero-banner--sem-imagem{% endif %}"
   style="min-height: {{ section.settings.altura_minima }}px;"
 >
   {% if section.settings.imagem_fundo != blank %}
@@ -204,15 +204,23 @@
     >
   {% endif %}
 
+  {% if request.design_mode and section.settings.imagem_fundo == blank %}
+    {%- comment -%} Indicador de que o lojista pode adicionar uma imagem de fundo {%- endcomment -%}
+    <div class="hero-banner__editor-hint" tabindex="0">
+      <span class="hero-banner__editor-hint-icon" aria-hidden="true">!</span>
+      <span class="hero-banner__editor-hint-tooltip">
+        Adicione uma imagem de fundo nas configurações da seção
+      </span>
+    </div>
+  {% endif %}
+
   <div
     class="hero-banner__overlay"
     style="
       background-color: {{ section.settings.cor_overlay }};
       opacity: {{ section.settings.opacidade_overlay | divided_by: 100.0 }};
     "
-  >
-    ""
-  </div>
+  >""</div>
 
   <div class="hero-banner__content hero-banner__content--{{ section.settings.alinhamento }}">
     {% for block in section.blocks %}
@@ -222,11 +230,20 @@
             class="hero-banner__heading"
             {{ block.shopify_attributes }}
           >
-            <{{ block.settings.tamanho_titulo }}
-              style="color: {{ block.settings.cor_titulo }};"
-            >
-              {{ block.settings.texto_titulo }}
-            </{{ block.settings.tamanho_titulo }}>
+            {% if block.settings.texto_titulo != blank %}
+              <{{ block.settings.tamanho_titulo }}
+                style="color: {{ block.settings.cor_titulo }};"
+              >
+                {{ block.settings.texto_titulo }}
+              </{{ block.settings.tamanho_titulo }}>
+            {% elsif request.design_mode %}
+              <{{ block.settings.tamanho_titulo }}
+                class="hero-banner__placeholder-text"
+                style="color: {{ block.settings.cor_titulo }};"
+              >
+                Adicione um título
+              </{{ block.settings.tamanho_titulo }}>
+            {% endif %}
           </div>
 
         {% when 'paragraph' %}
@@ -235,25 +252,31 @@
             {{ block.shopify_attributes }}
             style="color: {{ block.settings.cor_paragrafo }};"
           >
-            {{ block.settings.conteudo_paragrafo }}
+            {% if block.settings.conteudo_paragrafo != blank %}
+              {{ block.settings.conteudo_paragrafo }}
+            {% elsif request.design_mode %}
+              <p class="hero-banner__placeholder-text">Adicione um slogan/chamada</p>
+            {% endif %}
           </div>
 
         {% when 'button' %}
-          <div
-            class="hero-banner__button"
-            {{ block.shopify_attributes }}
-          >
-            <a
-              href="{{ block.settings.link_botao }}"
-              class="button button--{{ block.settings.estilo_botao }}"
+          {% if block.settings.texto_botao != blank or request.design_mode %}
+            <div
+              class="hero-banner__button"
+              {{ block.shopify_attributes }}
             >
-              {{ block.settings.texto_botao }}
-            </a>
-          </div>
+              <a
+                href="{{ block.settings.link_botao | default: '#' }}"
+                class="button button--{{ block.settings.estilo_botao }}{% if block.settings.texto_botao == blank %} hero-banner__placeholder-text{% endif %}"
+              >
+                {{ block.settings.texto_botao | default: 'Texto do botão' }}
+              </a>
+            </div>
+          {% endif %}
 
         {% when 'image' %}
           <div
-            class="hero-banner__image"
+            class="hero-banner__image{% if block.settings.imagem == blank %} hero-banner__image--vazia{% endif %}"
             style="max-width: {{ block.settings.largura_maxima }}px;"
             {{ block.shopify_attributes }}
           >
@@ -263,6 +286,23 @@
                 | image_url: width: 1200
                 | image_tag: alt: block.settings.alt_text
               }}
+            {% elsif request.design_mode %}
+              {%- comment -%} Placeholder com borda tracejada + ícone indicando a área do bloco de imagem {%- endcomment -%}
+              <div class="hero-banner__image-placeholder">
+                <svg
+                  class="hero-banner__image-placeholder-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+                <span class="hero-banner__image-placeholder-text">Adicione uma imagem</span>
+              </div>
             {% endif %}
           </div>
       {% endcase %}
@@ -279,6 +319,10 @@
     padding: 4rem 2rem;
   }
 
+  .hero-banner--sem-imagem {
+    background-color: #e1e1e1;
+  }
+
   .hero-banner__background-image {
     position: absolute;
     inset: 0;
@@ -287,6 +331,53 @@
     object-fit: cover;
     object-position: center;
     z-index: 0;
+  }
+
+  /*aviso de que dá pra adicionar imagem de fundo (somente no editor)*/
+
+  .hero-banner__editor-hint {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 3;
+  }
+
+  .hero-banner__editor-hint-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #9a9a9a;
+    color: #1a1a1a;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-style: italic;
+    cursor: default;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-banner__editor-hint-tooltip {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 260px;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+  }
+
+  .hero-banner__editor-hint:hover .hero-banner__editor-hint-tooltip,
+  .hero-banner__editor-hint:focus .hero-banner__editor-hint-tooltip {
+    opacity: 1;
+    visibility: visible;
   }
 
   .hero-banner__overlay {
@@ -358,6 +449,13 @@
     margin: 0;
   }
 
+  /*texto placeholder (somente visível no editor quando o campo está vazio)*/
+
+  .hero-banner__placeholder-text {
+    opacity: 0.6;
+    font-style: italic;
+  }
+
   /*button*/
 
   .hero-banner__button {
@@ -415,6 +513,37 @@
     width: 100%;
     height: auto;
     border-radius: 4%;
+  }
+
+  /*placeholder do bloco de imagem (somente no editor, quando vazio)*/
+
+  .hero-banner__image--vazia {
+    aspect-ratio: 1 / 1;
+  }
+
+  .hero-banner__image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    border: 2px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+
+  .hero-banner__image-placeholder-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hero-banner__image-placeholder-text {
+    font-size: 1.1rem;
+    opacity: 0.85;
   }
 
   /*responsive*/
