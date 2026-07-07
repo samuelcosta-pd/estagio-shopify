@@ -9,66 +9,93 @@
  */
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero_banner_DDtxih": {
+      "type": "hero-banner",
       "blocks": {
-        "heading": {
+        "heading_Wn7Aa4": {
           "type": "heading",
           "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
+            "texto_titulo": "A sua loja do HEXA!",
+            "tamanho_titulo": "h1",
+            "cor_titulo": "#FFFFFF"
           }
         },
-        "button": {
-          "type": "buttons",
+        "paragraph_NG9JNk": {
+          "type": "paragraph",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "conteudo_paragrafo": "<p>Produtos oficiais da Seleção Brasileira.</p>",
+            "cor_paragrafo": "#FFFFFF"
+          }
+        },
+        "button_hbYL93": {
+          "type": "button",
+          "settings": {
+            "texto_botao": "Cupom 50% OFF",
+            "link_botao": "",
+            "estilo_botao": "primary"
+          }
+        },
+        "image_cmMkYB": {
+          "type": "image",
+          "settings": {
+            "imagem": "shopify://shop_images/camisa-brasil-11.avif",
+            "largura_maxima": 200,
+            "alt_text": ""
           }
         }
       },
       "block_order": [
-        "heading",
-        "button"
+        "heading_Wn7Aa4",
+        "paragraph_NG9JNk",
+        "button_hbYL93",
+        "image_cmMkYB"
       ],
+      "name": "Hero Banner",
       "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "image_behavior": "none",
-        "desktop_content_position": "bottom-center",
-        "desktop_content_alignment": "center",
-        "show_text_box": false,
-        "color_scheme": "scheme-3",
-        "stack_images_on_mobile": false,
-        "mobile_content_alignment": "center",
-        "show_text_below": false
+        "imagem_fundo": "shopify://shop_images/capa_760ba705-0cb6-4528-9ff4-3e0060198c61.webp",
+        "cor_overlay": "#000000",
+        "opacidade_overlay": 40,
+        "altura_minima": 500,
+        "alinhamento": "center"
       }
     },
     "exercicio_liquid_basico_Ukk8FW": {
       "type": "exercicio-liquid-basico",
       "name": "Exercício Liquid Básico",
-      "settings": {}
+      "settings": {
+        "titulo": "Bem-vindo à nossa loja",
+        "descricao": "<p>Aqui você encontra os melhores produtos.</p>",
+        "quantidade_produtos": 4,
+        "layout": "grid",
+        "bg_color": "#ffffff"
+      }
     },
     "exercicio_product_grid_3pEQPQ": {
       "type": "exercicio-product-grid",
       "name": "Grade de Produtos",
       "settings": {
         "titulo": "Nossos Produtos",
+        "titulo_tamanho": 28,
+        "titulo_posicao": "center",
         "colecao": "automated-collection",
         "colunas": 3,
         "limite": 6,
         "show_badge": true,
         "cor_fundo": "#ffffff"
       }
+    },
+    "exercicio_filtros_Eaf7VQ": {
+      "type": "exercicio-filtros",
+      "name": "Exercício Filtros Liquid",
+      "settings": {
+        "colecao": "automated-collection"
+      }
     }
   },
   "order": [
-    "image_banner",
+    "hero_banner_DDtxih",
     "exercicio_liquid_basico_Ukk8FW",
-    "exercicio_product_grid_3pEQPQ"
+    "exercicio_product_grid_3pEQPQ",
+    "exercicio_filtros_Eaf7VQ"
   ]
 }
