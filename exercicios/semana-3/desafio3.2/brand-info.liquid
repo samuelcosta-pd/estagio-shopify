@@ -1,0 +1,270 @@
+{%- comment -%} sections/brand-info.liquid {%- endcomment -%}
+{% if product %}
+  {% assign marca = product.metafields.custom.marca.value %}
+{% endif %}
+
+{% assign editor_preview = false %}
+{% if request.design_mode and marca == blank %}
+  {% assign editor_preview = true %}
+{% endif %}
+
+{% if marca != blank or editor_preview %}
+
+<section class="brand-info page-width">
+  <div class="brand-info__wrapper">
+
+    <h2 class="brand-info__titulo">{{ section.settings.titulo }}</h2>
+
+    {% if editor_preview %}
+      <p class="brand-info__hint">
+        Este produto ainda não possui uma marca vinculada no metafield "marca"
+        (product.metafields.custom.marca). Associe um metaobject de marca para
+        exibir o conteúdo real aqui. Esta é apenas uma prévia.
+      </p>
+    {% endif %}
+
+    <div class="brand-info__card">
+
+      {%- comment -%} coluna esquerda: logo + nome + origem {%- endcomment -%}
+      <div class="brand-info__esquerda">
+        {%- if marca.logo -%}
+          <div class="brand-info__logo-box">
+            <img
+              class="brand-info__logo"
+              src="{{ marca.logo | image_url: width: 200 }}"
+              srcset="{{ marca.logo | image_url: width: 200 }} 1x, {{ marca.logo | image_url: width: 400 }} 2x"
+              alt="{{ marca.logo.alt | default: marca.nome | escape }}"
+              loading="lazy"
+              width="120"
+              height="120"
+            >
+          </div>
+        {%- elsif editor_preview -%}
+          <div class="brand-info__logo-box brand-info__logo-box--placeholder">
+            <span class="brand-info__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12.5 3H6a1 1 0 0 0-1 1v6.5a1 1 0 0 0 .3.7l9 9a1 1 0 0 0 1.4 0l6.5-6.5a1 1 0 0 0 0-1.4l-9-9a1 1 0 0 0-.7-.3z" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+              </svg>
+            </span>
+          </div>
+        {%- endif -%}
+
+        {%- if marca.nome or editor_preview -%}
+          <h3 class="brand-info__nome">{{ marca.nome | default: "Ex.: Nome da Marca" }}</h3>
+        {%- endif -%}
+
+        {%- if marca.pais_origem or editor_preview -%}
+          <p class="brand-info__origem">Origem: {{ marca.pais_origem | default: "Ex.: Brasil" }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} coluna direita: descrição + link {%- endcomment -%}
+      {%- if marca.descricao or marca.site or editor_preview -%}
+        <div class="brand-info__detalhes">
+          {%- if marca.descricao or editor_preview -%}
+            <h4 class="brand-info__descricao-titulo">Descrição</h4>
+            <p class="brand-info__descricao">
+              {{ marca.descricao | default: "Ex.: Uma breve descrição sobre a marca, sua história e seus diferenciais." }}
+            </p>
+          {%- endif -%}
+
+          {%- if marca.site -%}
+            <a
+              href="{{ marca.site }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="brand-info__link"
+            >
+              Visitar site da marca →
+            </a>
+          {%- elsif editor_preview -%}
+            <span class="brand-info__link brand-info__link--placeholder">
+              Visitar site da marca →
+            </span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+
+  </div>
+</section>
+
+{% endif %}
+
+<style>
+.brand-info{
+  margin-top:48px;
+}
+
+.brand-info__wrapper{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  padding:24px;
+  background:#fff;
+}
+
+.brand-info__titulo{
+  margin:0 0 24px;
+}
+
+.brand-info__hint{
+  margin:-8px 0 20px;
+  padding:10px 14px;
+  background:#fff8e1;
+  border:1px solid #f0d98c;
+  border-radius:8px;
+  font-size:13px;
+  color:#6b5900;
+}
+
+.brand-info__card{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:32px;
+  align-items:stretch;
+}
+
+.brand-info__esquerda{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.5rem;
+  text-align:center;
+}
+
+.brand-info__logo-box{
+  width:120px;
+  height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(0,0,0,.15);
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.brand-info__logo-box--placeholder{
+  background:#f4f4f4;
+  border-style:dashed;
+}
+
+.brand-info__icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  color:#999;
+}
+
+.brand-info__icon svg{
+  width:100%;
+  height:100%;
+}
+
+.brand-info__logo{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:12px;
+  box-sizing:border-box;
+}
+
+.brand-info__nome{
+  font-size:1.5rem;
+  font-weight:600;
+  margin:0.25rem 0 0;
+}
+
+.brand-info__origem{
+  font-size:1rem;
+  color:#666;
+  margin:0;
+}
+
+.brand-info__detalhes{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+  padding-left:32px;
+  border-left:1px solid rgba(0,0,0,.1);
+}
+
+.brand-info__descricao-titulo{
+  font-size:1.8rem;
+  font-weight:600;
+  margin:0;
+  color: dimgray;
+}
+
+.brand-info__descricao{
+  font-size:1.4rem;
+  line-height:1.6;
+  color:#333;
+  margin:0;
+}
+
+.brand-info__link{
+  display:inline-block;
+  margin-top:auto;
+  padding-top:0.5rem;
+  font-weight:600;
+  text-decoration:none;
+  color:#1a1a1a;
+}
+
+.brand-info__link:hover{
+  text-decoration:underline;
+}
+
+.brand-info__link--placeholder{
+  color:#999;
+  cursor:default;
+}
+
+.brand-info__link--placeholder:hover{
+  text-decoration:none;
+}
+
+@media screen and (max-width:599px){
+  .brand-info__card{
+    grid-template-columns:1fr;
+    justify-items:center;
+    text-align:center;
+  }
+
+  .brand-info__detalhes{
+    border-left:none;
+    border-top:1px solid rgba(0,0,0,.1);
+    padding-left:0;
+    padding-top:24px;
+    width:100%;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Sobre a Marca",
+  "settings": [
+    {
+      "type": "text",
+      "id": "titulo",
+      "label": "Título da seção",
+      "default": "Sobre a Marca"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Sobre a Marca",
+      "category": "product"
+    }
+  ]
+}
+{% endschema %}

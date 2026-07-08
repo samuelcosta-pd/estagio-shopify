@@ -1,0 +1,606 @@
+{% schema %}
+{
+  "name": "Hero Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "imagem_fundo",
+      "label": "Imagem de fundo"
+    },
+    {
+      "type": "color",
+      "id": "cor_overlay",
+      "label": "Cor do overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "opacidade_overlay",
+      "label": "Opacidade do overlay",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "altura_minima",
+      "label": "Altura mínima",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "default": 500,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "alinhamento",
+      "label": "Alinhamento do conteúdo",
+      "options": [
+        {
+          "value": "left",
+          "label": "Esquerda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        },
+        {
+          "value": "right",
+          "label": "Direita"
+        }
+      ],
+      "default": "center"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Título",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto_titulo",
+          "label": "Texto do título"
+        },
+        {
+          "type": "select",
+          "id": "tamanho_titulo",
+          "label": "Tamanho do título",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "color",
+          "id": "cor_titulo",
+          "label": "Cor do texto"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "name": "Parágrafo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "conteudo_paragrafo",
+          "label": "Conteúdo"
+        },
+        {
+          "type": "color",
+          "id": "cor_paragrafo",
+          "label": "Cor do texto"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Botão",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto_botao",
+          "label": "Texto do botão"
+        },
+        {
+          "type": "url",
+          "id": "link_botao",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "estilo_botao",
+          "label": "Estilo do botão",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primário/Preenchido"
+            },
+            {
+              "value": "secondary",
+              "label": "Secundário/Contorno"
+            }
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Imagem",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "imagem",
+          "label": "Imagem"
+        },
+        {
+          "type": "range",
+          "id": "largura_maxima",
+          "label": "Largura máxima",
+          "min": 50,
+          "max": 400,
+          "step": 10,
+          "default": 200,
+          "unit": "px"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<section
+  class="hero-banner{% if section.settings.imagem_fundo == blank %} hero-banner--sem-imagem{% endif %}"
+  style="min-height: {{ section.settings.altura_minima }}px;"
+>
+  {% if section.settings.imagem_fundo != blank %}
+    <img
+      class="hero-banner__background-image"
+      src="{{ section.settings.imagem_fundo | image_url: width: 1920 }}"
+      alt=""
+      width="{{ section.settings.imagem_fundo.width }}"
+      height="{{ section.settings.imagem_fundo.height }}"
+      loading="eager"
+      fetchpriority="high"
+    >
+  {% endif %}
+
+  {% if request.design_mode and section.settings.imagem_fundo == blank %}
+    {%- comment -%} Indicador de que o lojista pode adicionar uma imagem de fundo {%- endcomment -%}
+    <div class="hero-banner__editor-hint" tabindex="0">
+      <span class="hero-banner__editor-hint-icon" aria-hidden="true">!</span>
+      <span class="hero-banner__editor-hint-tooltip">
+        Adicione uma imagem de fundo nas configurações da seção
+      </span>
+    </div>
+  {% endif %}
+
+  <div
+    class="hero-banner__overlay"
+    style="
+      background-color: {{ section.settings.cor_overlay }};
+      opacity: {{ section.settings.opacidade_overlay | divided_by: 100.0 }};
+    "
+  >""</div>
+
+  <div class="hero-banner__content hero-banner__content--{{ section.settings.alinhamento }}">
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'heading' %}
+          <div
+            class="hero-banner__heading"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.texto_titulo != blank %}
+              <{{ block.settings.tamanho_titulo }}
+                style="color: {{ block.settings.cor_titulo }};"
+              >
+                {{ block.settings.texto_titulo }}
+              </{{ block.settings.tamanho_titulo }}>
+            {% elsif request.design_mode %}
+              <{{ block.settings.tamanho_titulo }}
+                class="hero-banner__placeholder-text"
+                style="color: {{ block.settings.cor_titulo }};"
+              >
+                Adicione um título
+              </{{ block.settings.tamanho_titulo }}>
+            {% endif %}
+          </div>
+
+        {% when 'paragraph' %}
+          <div
+            class="hero-banner__paragraph"
+            {{ block.shopify_attributes }}
+            style="color: {{ block.settings.cor_paragrafo }};"
+          >
+            {% if block.settings.conteudo_paragrafo != blank %}
+              {{ block.settings.conteudo_paragrafo }}
+            {% elsif request.design_mode %}
+              <p class="hero-banner__placeholder-text">Adicione um slogan/chamada</p>
+            {% endif %}
+          </div>
+
+        {% when 'button' %}
+          {% if block.settings.texto_botao != blank or request.design_mode %}
+            <div
+              class="hero-banner__button"
+              {{ block.shopify_attributes }}
+            >
+              <a
+                href="{{ block.settings.link_botao | default: '#' }}"
+                class="button button--{{ block.settings.estilo_botao }}{% if block.settings.texto_botao == blank %} hero-banner__placeholder-text{% endif %}"
+              >
+                {{ block.settings.texto_botao | default: 'Texto do botão' }}
+              </a>
+            </div>
+          {% endif %}
+
+        {% when 'image' %}
+          <div
+            class="hero-banner__image{% if block.settings.imagem == blank %} hero-banner__image--vazia{% endif %}"
+            style="max-width: {{ block.settings.largura_maxima }}px;"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.imagem != blank %}
+              {{
+                block.settings.imagem
+                | image_url: width: 1200
+                | image_tag: alt: block.settings.alt_text
+              }}
+            {% elsif request.design_mode %}
+              {%- comment -%} Placeholder com borda tracejada + ícone indicando a área do bloco de imagem {%- endcomment -%}
+              <div class="hero-banner__image-placeholder">
+                <svg
+                  class="hero-banner__image-placeholder-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="M21 15l-5-5L5 21" />
+                </svg>
+                <span class="hero-banner__image-placeholder-text">Adicione uma imagem</span>
+              </div>
+            {% endif %}
+          </div>
+      {% endcase %}
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+  .hero-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 4rem 2rem;
+  }
+
+  .hero-banner--sem-imagem {
+    background-color: #e1e1e1;
+  }
+
+  .hero-banner__background-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
+
+  /*aviso de que dá pra adicionar imagem de fundo (somente no editor)*/
+
+  .hero-banner__editor-hint {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 3;
+  }
+
+  .hero-banner__editor-hint-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #9a9a9a;
+    color: #1a1a1a;
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-style: italic;
+    cursor: default;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-banner__editor-hint-tooltip {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 260px;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+  }
+
+  .hero-banner__editor-hint:hover .hero-banner__editor-hint-tooltip,
+  .hero-banner__editor-hint:focus .hero-banner__editor-hint-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .hero-banner__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-banner__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /*Alinhamento dinâmico*/
+
+  .hero-banner__content--left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .hero-banner__content--center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-banner__content--right {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /*heading*/
+
+  .hero-banner__heading h1,
+  .hero-banner__heading h2,
+  .hero-banner__heading h3 {
+    margin: 0;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .hero-banner__heading h1 {
+    font-size: 3.5rem;
+  }
+
+  .hero-banner__heading h2 {
+    font-size: 2.5rem;
+  }
+
+  .hero-banner__heading h3 {
+    font-size: 2rem;
+  }
+
+  /*paragraph*/
+
+  .hero-banner__paragraph {
+    max-width: 700px;
+    font-size: 1.8rem;
+    line-height: 1.7;
+  }
+
+  .hero-banner__paragraph p {
+    margin: 0;
+  }
+
+  /*texto placeholder (somente visível no editor quando o campo está vazio)*/
+
+  .hero-banner__placeholder-text {
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /*button*/
+
+  .hero-banner__button {
+    display: flex;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0.875rem 1.75rem;
+
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+
+    text-decoration: none;
+    font-weight: 600;
+
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  /*primary*/
+
+  .button--primary {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  .button--primary:hover {
+    background-color: transparent;
+    color: #ffffff;
+  }
+
+  /*secondary*/
+
+  .button--secondary {
+    background-color: transparent;
+    color: #ffffff;
+  }
+
+  .button--secondary:hover {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  /*image*/
+
+  .hero-banner__image {
+    width: 100%;
+  }
+
+  .hero-banner__image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4%;
+  }
+
+  /*placeholder do bloco de imagem (somente no editor, quando vazio)*/
+
+  .hero-banner__image--vazia {
+    aspect-ratio: 1 / 1;
+  }
+
+  .hero-banner__image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    border: 2px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+
+  .hero-banner__image-placeholder-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hero-banner__image-placeholder-text {
+    font-size: 1.1rem;
+    opacity: 0.85;
+  }
+
+  /*responsive*/
+
+  @media (max-width: 991px) {
+    .hero-banner {
+      padding: 3rem 1.5rem;
+    }
+
+    .hero-banner__heading h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-banner__heading h2 {
+      font-size: 2rem;
+    }
+
+    .hero-banner__heading h3 {
+      font-size: 1.75rem;
+    }
+
+    .hero-banner__paragraph {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hero-banner {
+      padding: 2.5rem 1rem;
+    }
+
+    .hero-banner__content {
+      gap: 1rem;
+    }
+
+    .hero-banner__heading h1 {
+      font-size: 2rem;
+    }
+
+    .hero-banner__heading h2 {
+      font-size: 1.75rem;
+    }
+
+    .hero-banner__heading h3 {
+      font-size: 1.5rem;
+    }
+
+    .button {
+      width: 100%;
+    }
+
+    .hero-banner__button {
+      width: 100%;
+    }
+
+    .hero-banner__image img {
+      max-width: 100%;
+    }
+  }
+</style>
