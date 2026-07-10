@@ -1,0 +1,332 @@
+{% comment %} sections/world-cup-predictions.liquid {% endcomment %}
+{{ 'section-world-cup-predictions.css' | asset_url | stylesheet_tag }}
+
+<div class="predictions page-width section-{{ section.id }}-padding {% if section.settings.image_bg != blank %} predictions--has-img-bg {% endif %}" 
+     style="--bg-color-section: {{ section.settings.bg_color }}; {% if section.settings.image_bg != blank %} background-image: url('{{ section.settings.image_bg | image_url: width: 2000 }}'); {% endif %}">
+  
+  <div class="predictions__container center">
+    
+    <div class="predictions__blocks-wrapper">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            {%- assign heading_text = block.settings.text -%}
+            {%- if heading_text != blank -%}
+              <div class="predictions__header-block" {{ block.shopify_attributes }}>
+                <h2
+                  class="predictions__main-title inline-richtext {{ block.settings.heading_size }}"
+                  style="color: {{ block.settings.text_color }}; font-size: {{ block.settings.font_size }}px; font-family: {{ block.settings.font_family }};"
+                >
+                  {{ heading_text }}
+                </h2>
+              </div>
+            {%- endif -%}
+
+          {%- when 'subheading' -%}
+            {%- assign subtitle_text = block.settings.text -%}
+            {%- if subtitle_text != blank -%}
+              <div class="predictions__header-block predictions__header-block--subheading" {{ block.shopify_attributes }}>
+                <div
+                  class="predictions__main-subtitle rte"
+                  style="color: {{ block.settings.text_color }}; font-size: {{ block.settings.font_size }}px; font-family: {{ block.settings.font_family }};"
+                >
+                  {{ subtitle_text }}
+                </div>
+              </div>
+            {%- endif -%}
+
+          {%- when 'match_card' -%}
+            <div class="predictions__arena" style="--bg-color-card: {{ block.settings.card_bg_color }};" {{ block.shopify_attributes }}>
+              <div class="predictions__match-card">
+                <div class="predictions__team">
+                  <span class="predictions__flag" role="img" aria-label="{{ block.settings.team_1_name }}">{{ block.settings.team_1_flag }}</span>
+                  <span class="predictions__team-name">{{ block.settings.team_1_name }}</span>
+                </div>
+
+                <input type="text" class="predictions__input" placeholder="0" aria-label="Gols do {{ block.settings.team_1_name }}">
+
+                <div class="predictions__vs">VS</div>
+
+                <input type="text" class="predictions__input" placeholder="0" aria-label="Gols do {{ block.settings.team_2_name }}">
+
+                <div class="predictions__team">
+                  <span class="predictions__flag" role="img" aria-label="{{ block.settings.team_2_name }}">{{ block.settings.team_2_flag }}</span>
+                  <span class="predictions__team-name">{{ block.settings.team_2_name }}</span>
+                </div>
+              </div>
+
+              {%- if block.settings.match_date != blank -%}
+                <div class="predictions__info-match">
+                  <p>{{ block.settings.match_date }}</p>
+                </div>
+              {%- endif -%}
+            </div>
+
+          {%- when 'button_block' -%}
+            <div class="predictions__actions" {{ block.shopify_attributes }}>
+              {%- if block.settings.button_label != blank -%}
+                <a {% if block.settings.button_link == blank %} role="link" aria-disabled="true"{% else %} href="{{ block.settings.button_link }}"{% endif %}
+                   class="button predictions__button button--primary">
+                  {{ block.settings.button_label | escape }}
+                </a>
+              {%- endif -%}
+            </div>
+
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{% schema %}
+{
+  "name": "Arena de Palpites Copa",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Estilização de Fundo da Seção"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Cor de Fundo da Seção",
+      "default": "#ffffff"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_bg",
+      "label": "Imagem de Fundo (Opcional)",
+      "info": "Substitui a cor de fundo se preenchida."
+    },
+    {
+      "type": "header",
+      "content": "Espaçamento"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Espaçamento Superior",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Espaçamento Inferior",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Título",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto do título",
+          "default": "Palpite Premiado Copa 2027"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            { "value": "h2", "label": "Pequeno" },
+            { "value": "h1", "label": "Médio" },
+            { "value": "h0", "label": "Grande" }
+          ],
+          "default": "h1",
+          "label": "Tamanho do título"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Cor do texto",
+          "default": "#121212"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Tamanho da fonte",
+          "min": 20,
+          "max": 72,
+          "step": 2,
+          "unit": "px",
+          "default": 40
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Fonte",
+          "options": [
+            { "value": "inherit", "label": "Padrão do tema" },
+            { "value": "Arial, sans-serif", "label": "Arial" },
+            { "value": "Georgia, serif", "label": "Georgia" },
+            { "value": "'Montserrat', sans-serif", "label": "Montserrat" }
+          ],
+          "default": "inherit"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Parágrafo",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto do parágrafo",
+          "default": "<p>Acerte o placar final do próximo jogaço da nossa seleção feminina e fature na hora 10% de desconto em toda a loja!</p>"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Cor do texto",
+          "default": "#4b4b4b"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Tamanho da fonte",
+          "min": 14,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "select",
+          "id": "font_family",
+          "label": "Fonte",
+          "options": [
+            { "value": "inherit", "label": "Padrão do tema" },
+            { "value": "Arial, sans-serif", "label": "Arial" },
+            { "value": "Georgia, serif", "label": "Georgia" },
+            { "value": "'Montserrat', sans-serif", "label": "Montserrat" }
+          ],
+          "default": "inherit"
+        }
+      ]
+    },
+    {
+      "type": "match_card",
+      "name": "Card do Confronto",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "Cor de Fundo da Caixa",
+          "default": "#f4f4f4"
+        },
+        {
+          "type": "header",
+          "content": "Time Mandante"
+        },
+        {
+          "type": "text",
+          "id": "team_1_name",
+          "label": "Nome do Time 1",
+          "default": "Brasil"
+        },
+        {
+          "type": "text",
+          "id": "team_1_flag",
+          "label": "Bandeira Emoji do Time 1",
+          "default": "🇧🇷",
+          "info": "Dica: Copie e cole o emoji da bandeira do país desejado."
+        },
+        {
+          "type": "header",
+          "content": "Time Visitante"
+        },
+        {
+          "type": "text",
+          "id": "team_2_name",
+          "label": "Nome do Time 2",
+          "default": "França"
+        },
+        {
+          "type": "text",
+          "id": "team_2_flag",
+          "label": "Bandeira Emoji do Time 2",
+          "default": "🇫🇷",
+          "info": "Dica: Copie e cole o emoji da bandeira do país desejado."
+        },
+        {
+          "type": "header",
+          "content": "Informações da Partida"
+        },
+        {
+          "type": "text",
+          "id": "match_date",
+          "label": "Data / Rodada",
+          "default": "Próximo Confronto: Fase de Grupos - Em breve"
+        }
+      ]
+    },
+    {
+      "type": "button_block",
+      "name": "Botão de Envio",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto do Botão",
+          "default": "Enviar Meu Palpite"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Link do Botão"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Arena de Palpites Copa",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "subheading"
+        },
+        {
+          "type": "match_card"
+        },
+        {
+          "type": "button_block"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
