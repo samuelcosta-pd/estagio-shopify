@@ -110,11 +110,28 @@ Estagiário: Samuel Costa
   - Aplicar a classe no container dos produtos
   {%- endcomment -%}
 
-  <div class="produtos-container {% if section.settings.layout == 'grid' %}layout-grid{% else %}layout-list{% endif %}">
+  {%- assign layout_class = 'layout-list' -%}
+  {%- if section.settings.layout == 'grid' -%}
+    {%- assign layout_class = 'layout-grid' -%}
+  {%- endif -%}
+
+  <div class="produtos-container {{ layout_class }}">
     {% for product in collections.all.products limit: section.settings.quantidade_produtos %}
+      {%- assign p_title = product.title -%}
+      {%- if forloop.index <= 2 -%}
+        {%- assign img_loading = 'eager' -%}
+      {%- else -%}
+        {%- assign img_loading = 'lazy' -%}
+      {%- endif -%}
       <div class="produto-item">
-        <img src="{{ product.featured_image | image_url: width: 300 }}" alt="{{ product.title }}" width="300" height="300">
-        <h3>{{ product.title }}</h3>
+        {% if product.featured_image != blank %}
+          {{
+            product.featured_image
+            | image_url: width: 300
+            | image_tag: alt: p_title, width: 300, height: 300, loading: img_loading
+          }}
+        {% endif %}
+        <h3>{{ p_title }}</h3>
         <p class="preco">{{ product.price | money }}</p>
       </div>
     {% endfor %}

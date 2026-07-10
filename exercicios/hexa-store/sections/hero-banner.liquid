@@ -188,55 +188,62 @@
 }
 {% endschema %}
 
-<section
-  class="hero-banner{% if section.settings.imagem_fundo == blank %} hero-banner--sem-imagem{% endif %}"
-  style="min-height: {{ section.settings.altura_minima }}px;"
->
-  {% if section.settings.imagem_fundo != blank %}
-    <img
-      class="hero-banner__background-image"
-      src="{{ section.settings.imagem_fundo | image_url: width: 1920 }}"
-      alt=""
-      width="{{ section.settings.imagem_fundo.width }}"
-      height="{{ section.settings.imagem_fundo.height }}"
-      loading="eager"
-      fetchpriority="high"
-    >
-  {% endif %}
+  {%- assign bg_image = section.settings.imagem_fundo -%}
+  {%- assign design_mode = request.design_mode -%}
 
-  {% if request.design_mode and section.settings.imagem_fundo == blank %}
-    {%- comment -%} Indicador de que o lojista pode adicionar uma imagem de fundo {%- endcomment -%}
-    <div class="hero-banner__editor-hint" tabindex="0">
-      <span class="hero-banner__editor-hint-icon" aria-hidden="true">!</span>
-      <span class="hero-banner__editor-hint-tooltip">
-        Adicione uma imagem de fundo nas configurações da seção
-      </span>
-    </div>
-  {% endif %}
+  <section
+    class="hero-banner{% if bg_image == blank %} hero-banner--sem-imagem{% endif %}"
+    style="min-height: {{ section.settings.altura_minima }}px;"
+  >
+    {% if bg_image != blank %}
+      {{
+        bg_image
+        | image_url: width: 3840
+        | image_tag:
+          class: 'hero-banner__background-image',
+          alt: '',
+          loading: 'eager',
+          fetchpriority: 'high',
+          preload: true,
+          widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+          sizes: '100vw'
+      }}
+    {% endif %}
 
-  <div
-    class="hero-banner__overlay"
-    style="
-      background-color: {{ section.settings.cor_overlay }};
-      opacity: {{ section.settings.opacidade_overlay | divided_by: 100.0 }};
-    "
-  >""</div>
+    {% if design_mode and bg_image == blank %}
+      {%- comment -%} Indicador de que o lojista pode adicionar uma imagem de fundo {%- endcomment -%}
+      <div class="hero-banner__editor-hint" tabindex="0">
+        <span class="hero-banner__editor-hint-icon" aria-hidden="true">!</span>
+        <span class="hero-banner__editor-hint-tooltip">
+          Adicione uma imagem de fundo nas configurações da seção
+        </span>
+      </div>
+    {% endif %}
+
+    <div
+      class="hero-banner__overlay"
+      style="
+        background-color: {{ section.settings.cor_overlay }};
+        opacity: {{ section.settings.opacidade_overlay | divided_by: 100.0 }};
+      "
+    ></div>
 
   <div class="hero-banner__content hero-banner__content--{{ section.settings.alinhamento }}">
     {% for block in section.blocks %}
       {% case block.type %}
         {% when 'heading' %}
+          {%- assign titulo = block.settings.texto_titulo -%}
           <div
             class="hero-banner__heading"
             {{ block.shopify_attributes }}
           >
-            {% if block.settings.texto_titulo != blank %}
+            {% if titulo != blank %}
               <{{ block.settings.tamanho_titulo }}
                 style="color: {{ block.settings.cor_titulo }};"
               >
-                {{ block.settings.texto_titulo }}
+                {{ titulo }}
               </{{ block.settings.tamanho_titulo }}>
-            {% elsif request.design_mode %}
+            {% elsif design_mode %}
               <{{ block.settings.tamanho_titulo }}
                 class="hero-banner__placeholder-text"
                 style="color: {{ block.settings.cor_titulo }};"
@@ -247,46 +254,61 @@
           </div>
 
         {% when 'paragraph' %}
+          {%- assign conteudo = block.settings.conteudo_paragrafo -%}
           <div
             class="hero-banner__paragraph"
             {{ block.shopify_attributes }}
             style="color: {{ block.settings.cor_paragrafo }};"
           >
-            {% if block.settings.conteudo_paragrafo != blank %}
-              {{ block.settings.conteudo_paragrafo }}
-            {% elsif request.design_mode %}
+            {% if conteudo != blank %}
+              {{ conteudo }}
+            {% elsif design_mode %}
               <p class="hero-banner__placeholder-text">Adicione um slogan/chamada</p>
             {% endif %}
           </div>
 
         {% when 'button' %}
-          {% if block.settings.texto_botao != blank or request.design_mode %}
+          {%- assign texto_botao = block.settings.texto_botao -%}
+          {% if texto_botao != blank or design_mode %}
             <div
               class="hero-banner__button"
               {{ block.shopify_attributes }}
             >
               <a
                 href="{{ block.settings.link_botao | default: '#' }}"
-                class="button button--{{ block.settings.estilo_botao }}{% if block.settings.texto_botao == blank %} hero-banner__placeholder-text{% endif %}"
+                class="button button--{{ block.settings.estilo_botao }}{% if texto_botao == blank %} hero-banner__placeholder-text{% endif %}"
               >
-                {{ block.settings.texto_botao | default: 'Texto do botão' }}
+                {{ texto_botao | default: 'Texto do botão' }}
               </a>
             </div>
           {% endif %}
 
         {% when 'image' %}
+          {%- assign img_bloco = block.settings.imagem -%}
+          {%- assign largura_maxima = block.settings.largura_maxima -%}
           <div
-            class="hero-banner__image{% if block.settings.imagem == blank %} hero-banner__image--vazia{% endif %}"
-            style="max-width: {{ block.settings.largura_maxima }}px;"
+            class="hero-banner__image{% if img_bloco == blank %} hero-banner__image--vazia{% endif %}"
+            style="max-width: {{ largura_maxima }}px;"
             {{ block.shopify_attributes }}
           >
-            {% if block.settings.imagem != blank %}
+            {% if img_bloco != blank %}
+              {%- capture sizes -%}(max-width: {{ largura_maxima }}px) 100vw, {{ largura_maxima }}px{%- endcapture -%}
+              {%- comment -%}
+                Esta imagem NÃO é o elemento LCP da seção (o LCP real é a imagem
+                de fundo, com preload + fetchpriority high acima). Por isso ela
+                usa loading lazy e prioridade padrão — evita competir por banda/
+                prioridade com a imagem de fundo e atrasar o LCP real.
+              {%- endcomment -%}
               {{
-                block.settings.imagem
-                | image_url: width: 1200
-                | image_tag: alt: block.settings.alt_text
+                img_bloco
+                | image_url: width: 800
+                | image_tag: 
+                  alt: block.settings.alt_text,
+                  loading: 'lazy',
+                  widths: '200, 300, 400, 500, 600, 800',
+                  sizes: sizes
               }}
-            {% elsif request.design_mode %}
+            {% elsif design_mode %}
               {%- comment -%} Placeholder com borda tracejada + ícone indicando a área do bloco de imagem {%- endcomment -%}
               <div class="hero-banner__image-placeholder">
                 <svg
