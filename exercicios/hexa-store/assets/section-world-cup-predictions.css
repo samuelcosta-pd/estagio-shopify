@@ -1,0 +1,128 @@
+/* assets/section-world-cup-predictions.css */
+.predictions__container {
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+.predictions__header {
+  margin-bottom: 3.5rem;
+}
+
+.predictions__main-subtitle {
+  color: rgba(var(--color-foreground), 0.75);
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+/* Arena do Confronto */
+.predictions__arena {
+  background: rgba(var(--color-foreground), 0.04);
+  border: 2px solid rgba(var(--color-foreground), 0.1);
+  border-radius: 1.6rem;
+  padding: 3rem 2rem;
+  margin-bottom: 4rem;
+}
+
+.predictions__match-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+.predictions__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 12rem;
+}
+
+.predictions__flag {
+  font-size: 4.8rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.predictions__team-name {
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 0.05rem;
+}
+
+.predictions__vs {
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-style: italic;
+  color: rgba(var(--color-foreground), 0.4);
+  background: rgba(var(--color-foreground), 0.08);
+  padding: 0.8rem 1.5rem;
+  border-radius: 0.8rem;
+}
+
+.predictions__info-match {
+  margin-top: 2rem;
+  font-size: 1.4rem;
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+/* Blocos Informativos */
+.predictions__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+}
+
+.predictions__step-card {
+  background: rgba(var(--color-foreground), 0.02);
+  border: 1px solid rgba(var(--color-foreground), 0.05);
+  padding: 2.5rem 2rem;
+  border-radius: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.predictions__step-icon {
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.predictions__step-title {
+  margin: 0 0 1rem 0;
+}
+
+.predictions__step-text {
+  font-size: 1.4rem;
+  color: rgba(var(--color-foreground), 0.8);
+}
+
+.predictions__actions {
+  margin-top: 2rem;
+}
+
+/* Responsividade Mobile */
+@media screen and (max-width: 749px) {
+  .predictions__match-card {
+    gap: 1.5rem;
+  }
+  .predictions__flag {
+    font-size: 3.6rem;
+  }
+  .predictions__team-name {
+    font-size: 1.5rem;
+  }
+  .predictions__vs {
+    font-size: 1.6rem;
+    padding: 0.5rem 1rem;
+  }
+}
