@@ -191,22 +191,6 @@
   {%- assign bg_image = section.settings.imagem_fundo -%}
   {%- assign design_mode = request.design_mode -%}
 
-  {%- comment -%}
-    Preload da LCP image — instrui o browser a iniciar o fetch da imagem
-    hero ANTES de encontrá-la no DOM, eliminando o "discovery delay" do LCP.
-    O imagesrcset espelha os mesmos widths do image_tag abaixo para coerência.
-  {%- endcomment -%}
-  {%- if bg_image != blank -%}
-    <link
-      rel="preload"
-      as="image"
-      href="{{ bg_image | image_url: width: 1500 }}"
-      imagesrcset="{{ bg_image | image_url: width: 375 }} 375w, {{ bg_image | image_url: width: 750 }} 750w, {{ bg_image | image_url: width: 1100 }} 1100w, {{ bg_image | image_url: width: 1500 }} 1500w, {{ bg_image | image_url: width: 2000 }} 2000w, {{ bg_image | image_url: width: 3000 }} 3000w"
-      imagesizes="100vw"
-      fetchpriority="high"
-    >
-  {%- endif -%}
-
   <section
     class="hero-banner{% if bg_image == blank %} hero-banner--sem-imagem{% endif %}"
     style="min-height: {{ section.settings.altura_minima }}px;"
@@ -220,6 +204,7 @@
           alt: '',
           loading: 'eager',
           fetchpriority: 'high',
+          preload: true,
           widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
           sizes: '100vw'
       }}
@@ -308,13 +293,18 @@
           >
             {% if img_bloco != blank %}
               {%- capture sizes -%}(max-width: {{ largura_maxima }}px) 100vw, {{ largura_maxima }}px{%- endcapture -%}
+              {%- comment -%}
+                Esta imagem NÃO é o elemento LCP da seção (o LCP real é a imagem
+                de fundo, com preload + fetchpriority high acima). Por isso ela
+                usa loading lazy e prioridade padrão — evita competir por banda/
+                prioridade com a imagem de fundo e atrasar o LCP real.
+              {%- endcomment -%}
               {{
                 img_bloco
                 | image_url: width: 800
                 | image_tag: 
                   alt: block.settings.alt_text,
-                  loading: 'eager',
-                  fetchpriority: 'high',
+                  loading: 'lazy',
                   widths: '200, 300, 400, 500, 600, 800',
                   sizes: sizes
               }}
