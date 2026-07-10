@@ -1,4 +1,4 @@
-# Estágio Shopify - WebJump Fase 2 (Sprint 1)
+# Estágio Shopify - WebJump Fase 2 (Sprint 1 a 3)       
 
 Este repositório contém as atividades e exercícios práticos desenvolvidos por **Samuel Costa** durante a Sprint 1 a 3 do programa de estágio da WebJump (Fase 2), com foco no ecossistema Shopify e nivelamento em JavaScript.
 
