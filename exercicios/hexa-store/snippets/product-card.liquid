@@ -13,6 +13,16 @@
 {%- assign largura = image_width | default: 400 -%}
 {%- assign show_badge = show_badge | default: true -%}
 
+{%- assign p_url = product.url -%}
+{%- assign p_title = product.title | escape -%}
+{%- assign p_price = product.price -%}
+{%- assign p_compare_at_price = product.compare_at_price -%}
+{%- assign p_available = product.available -%}
+{%- assign has_discount = false -%}
+{%- if p_compare_at_price and p_compare_at_price > p_price -%}
+  {%- assign has_discount = true -%}
+{%- endif -%}
+
 <style>
   .product-card{border:1px solid #e6e6e6;border-radius:8px;overflow:hidden;padding:12px;background:#fff;transition:box-shadow .18s ease}
   .product-card:hover{box-shadow:0 6px 18px rgba(0,0,0,.08)}
@@ -43,29 +53,26 @@
 <div class="product-card">
   <div class="product-card__media">
     {% if show_badge %}
-      {% if product.available == false %}
+      {% if p_available == false %}
         <span class="product-card__badge product-card__badge--sold">Esgotado</span>
-      {% elsif product.compare_at_price and product.compare_at_price > product.price %}
-        {% assign desconto = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round %}
+      {% elsif has_discount %}
+        {% assign desconto = p_compare_at_price | minus: p_price | times: 100 | divided_by: p_compare_at_price | round %}
         <span class="product-card__badge">-{{ desconto }}%</span>
       {% endif %}
     {% endif %}
 
     {% if product.featured_image %}
-      {% comment %} Normalize image URL to avoid relative /files/... paths that cause 404s {% endcomment %}
-      {% assign image_src =  product.featured_image | image_url: width: largura %}
-      {% unless image_src contains 'http' or image_src contains '//' %}
-        {% if image_src contains '/files/' %}
-          {% assign image_src = shop.secure_url | append: image_src %}
-        {% endif %}
-      {% endunless %}
-
-      <a href="{{ product.url }}">
-        <img
-          src="{{ image_src }}"
-          alt="{{ product.title | escape }}"
-          class="product-card__image"
-          width="{{ largura }}" height="{{ largura }}" />
+      <a href="{{ p_url }}">
+        {{
+          product.featured_image
+          | image_url: width: largura
+          | image_tag:
+            alt: p_title,
+            class: 'product-card__image',
+            width: largura,
+            height: largura,
+            loading: 'lazy'
+        }}
       </a>
     {% else %}
       {% capture placeholder_svg %}
@@ -75,14 +82,14 @@
         </svg>
       {% endcapture %}
 
-      <a href="{{ product.url }}">
-        <img src="data:image/svg+xml;utf8,{{ placeholder_svg | url_encode }}" alt="{{ product.title | escape }}" class="product-card__image" width="{{ largura }}" height="{{ largura }}" />
+      <a href="{{ p_url }}">
+        <img src="data:image/svg+xml;utf8,{{ placeholder_svg | url_encode }}" alt="{{ p_title }}" class="product-card__image" width="{{ largura }}" height="{{ largura }}" loading="lazy" />
       </a>
     {% endif %}
   </div>
 
   <div class="product-card__content">
-    <h3 class="product-card__title"><a href="{{ product.url }}" title="{{ product.title | escape }}">{{ product.title | escape }}</a></h3>
+    <h3 class="product-card__title"><a href="{{ p_url }}" title="{{ p_title }}">{{ p_title }}</a></h3>
 
     {%- comment -%} Render color variants as swatches if product has a color option {%- endcomment -%}
     {%- assign color_option = nil -%}
@@ -104,21 +111,20 @@
           {%- comment -%} Find a variant that matches this color value to link directly to it {% endcomment -%}
           {%- assign variant_id = nil -%}
           {%- assign variant_available = true -%}
-          {%- for var in product.variants -%}
-            {%- assign match = false -%}
-            {%- if color_option_position == 1 and var.option1 == v_trim -%}
-              {%- assign match = true -%}
-            {%- elsif color_option_position == 2 and var.option2 == v_trim -%}
-              {%- assign match = true -%}
-            {%- elsif color_option_position == 3 and var.option3 == v_trim -%}
-              {%- assign match = true -%}
-            {%- endif -%}
-            {%- if match -%}
-              {%- assign variant_id = var.id -%}
-              {%- assign variant_available = var.available -%}
-              {%- break -%}
-            {%- endif -%}
-          {%- endfor -%}
+
+          {%- assign variant = nil -%}
+          {%- if color_option_position == 1 -%}
+            {%- assign variant = product.variants | where: 'option1', v_trim | first -%}
+          {%- elsif color_option_position == 2 -%}
+            {%- assign variant = product.variants | where: 'option2', v_trim | first -%}
+          {%- elsif color_option_position == 3 -%}
+            {%- assign variant = product.variants | where: 'option3', v_trim | first -%}
+          {%- endif -%}
+
+          {%- if variant -%}
+            {%- assign variant_id = variant.id -%}
+            {%- assign variant_available = variant.available -%}
+          {%- endif -%}
 
           {%- comment -%} If value looks like a hex code, use it directly; otherwise try as color name {% endcomment -%}
           {% if v_trim contains '#' %}
@@ -128,7 +134,7 @@
           {% endif %}
 
           {% if variant_id %}
-            <a href="{{ product.url }}?variant={{ variant_id }}" class="product-card__swatch-link" title="{{ v_trim | escape }}" aria-label="{{ v_trim | escape }}">
+            <a href="{{ p_url }}?variant={{ variant_id }}" class="product-card__swatch-link" title="{{ v_trim | escape }}" aria-label="{{ v_trim | escape }}">
               <span class="product-card__swatch{% unless variant_available %} product-card__swatch--sold{% endunless %}" style="background-color: {{ swatch_color }}"></span>
             </a>
           {% else %}
@@ -141,16 +147,16 @@
 
     <div class="product-card__actions">
       <div>
-        <span class="product-card__preco">{{ product.price | money }}</span>
-        {% if product.compare_at_price and product.compare_at_price > product.price %}
-          <span class="product-card__preco--original">{{ product.compare_at_price | money }}</span>
+        <span class="product-card__preco">{{ p_price | money }}</span>
+        {% if has_discount %}
+          <span class="product-card__preco--original">{{ p_compare_at_price | money }}</span>
         {% endif %}
       </div>
 
-      {% if product.available == false %}
+      {% if p_available == false %}
         <button class="product-card__btn disabled" disabled>Indisponível</button>
       {% else %}
-        <a href="{{ product.url }}" class="product-card__btn">Adicionar ao carrinho</a>
+        <a href="{{ p_url }}" class="product-card__btn">Adicionar ao carrinho</a>
       {% endif %}
     </div>
   </div>

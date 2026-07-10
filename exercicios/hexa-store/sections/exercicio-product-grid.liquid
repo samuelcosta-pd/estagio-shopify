@@ -83,24 +83,29 @@
   {% endif %}
 
   {% if section.settings.colecao != blank %}
-    {% assign colecao = collections[section.settings.colecao] %}
+    {%- assign colecao = section.settings.colecao -%}
+    {%- if colecao.products == blank -%}
+      {%- assign colecao = collections[section.settings.colecao] -%}
+    {%- endif -%}
+    {%- assign limite = section.settings.limite -%}
+    {%- assign show_badge = section.settings.show_badge -%}
 
     <div
       class="product-grid__container"
       style="--colunas: {{ section.settings.colunas }}"
     >
-      {% for product in colecao.products limit: section.settings.limite %}
+      {% for product in colecao.products limit: limite %}
         {% render 'product-card',
           product: product,
-          show_badge: section.settings.show_badge
+          show_badge: show_badge
         %}
       {% endfor %}
     </div>
 
-    {% if colecao.products.size > section.settings.limite %}
+    {% if colecao.all_products_count > limite %}
       <div class="product-grid__ver-mais">
         <a href="{{ colecao.url }}" class="product-grid__link">
-          Ver todos os {{ colecao.products.size }} produtos
+          Ver todos os {{ colecao.all_products_count }} produtos
         </a>
       </div>
     {% endif %}
