@@ -2,16 +2,22 @@
   Snippet: Product Card
 
   Uso:
-  {% render 'product-card', product: product, show_badge: true, image_width: 400 %}
+  {% render 'product-card', product: product, show_badge: true, image_width: 400, lazy: true %}
 
   Parâmetros:
   - product: objeto do produto (obrigatório)
   - show_badge: exibir badge de promoção (opcional, default: true)
   - image_width: largura da imagem (opcional, default: 400)
+  - lazy: usar lazy loading na imagem (opcional, default: true)
 {% endcomment %}
 
 {%- assign largura = image_width | default: 400 -%}
 {%- assign show_badge = show_badge | default: true -%}
+{%- if lazy == false -%}
+  {%- assign card_loading = 'eager' -%}
+{%- else -%}
+  {%- assign card_loading = 'lazy' -%}
+{%- endif -%}
 
 {%- assign p_url = product.url -%}
 {%- assign p_title = product.title | escape -%}
@@ -65,13 +71,13 @@
       <a href="{{ p_url }}">
         {{
           product.featured_image
-          | image_url: width: largura
+          | image_url: width: largura, format: 'pjpg'
           | image_tag:
             alt: p_title,
             class: 'product-card__image',
             width: largura,
             height: largura,
-            loading: 'lazy'
+            loading: card_loading
         }}
       </a>
     {% else %}

@@ -118,12 +118,17 @@ Estagiário: Samuel Costa
   <div class="produtos-container {{ layout_class }}">
     {% for product in collections.all.products limit: section.settings.quantidade_produtos %}
       {%- assign p_title = product.title -%}
+      {%- if forloop.index <= 2 -%}
+        {%- assign img_loading = 'eager' -%}
+      {%- else -%}
+        {%- assign img_loading = 'lazy' -%}
+      {%- endif -%}
       <div class="produto-item">
         {% if product.featured_image != blank %}
           {{
             product.featured_image
             | image_url: width: 300
-            | image_tag: alt: p_title, width: 300, height: 300, loading: 'lazy'
+            | image_tag: alt: p_title, width: 300, height: 300, loading: img_loading
           }}
         {% endif %}
         <h3>{{ p_title }}</h3>

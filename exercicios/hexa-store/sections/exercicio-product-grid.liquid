@@ -95,9 +95,15 @@
       style="--colunas: {{ section.settings.colunas }}"
     >
       {% for product in colecao.products limit: limite %}
+        {%- if forloop.index <= section.settings.colunas -%}
+          {%- assign card_lazy = false -%}
+        {%- else -%}
+          {%- assign card_lazy = true -%}
+        {%- endif -%}
         {% render 'product-card',
           product: product,
-          show_badge: show_badge
+          show_badge: show_badge,
+          lazy: card_lazy
         %}
       {% endfor %}
     </div>
