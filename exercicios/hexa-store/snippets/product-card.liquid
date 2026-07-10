@@ -67,16 +67,17 @@
       {% endif %}
     {% endif %}
 
-    {% if product.featured_image %}
+    {%- assign p_img = product.featured_image -%}
+    {% if p_img %}
       <a href="{{ p_url }}">
         {{
-          product.featured_image
-          | image_url: width: largura, format: 'pjpg'
+          p_img
+          | image_url: width: largura
           | image_tag:
             alt: p_title,
             class: 'product-card__image',
-            width: largura,
-            height: largura,
+            width: p_img.width,
+            height: p_img.height,
             loading: card_loading
         }}
       </a>
@@ -91,7 +92,7 @@
       <a href="{{ p_url }}">
         <img src="data:image/svg+xml;utf8,{{ placeholder_svg | url_encode }}" alt="{{ p_title }}" class="product-card__image" width="{{ largura }}" height="{{ largura }}" loading="lazy" />
       </a>
-    {% endif %}
+    {% endif %}  {%- comment -%} /if p_img {%- endcomment -%}
   </div>
 
   <div class="product-card__content">

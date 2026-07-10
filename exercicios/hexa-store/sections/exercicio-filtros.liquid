@@ -22,7 +22,7 @@
 
     <h2>{{ colecao.title | upcase }}</h2>
 
-    <p>Total de produtos: {{ colecao.products.size }}</p>
+    <p>Total de produtos: {{ colecao.all_products_count }}</p>
 
     {%- comment -%}
       TAREFA 1: Para cada produto da coleção, exibir:
@@ -87,63 +87,101 @@
       - Exibir o resumo em um <p> com classe "resumo"
     {%- endcomment -%}
      
-        <div class="produtos-container">
-        {% assign produtos_em_promocao = 0 %}
+    <div class="produtos-container">
+      {%- assign produtos_em_promocao = 0 -%}
+      {%- assign colecao_total = colecao.all_products_count -%}
 
-        {%- comment -%} Primeiro: produtos em promoção (disponíveis com compare_at_price > price) {%- endcomment -%}
-        {% for produto in colecao.products %}
-          {% if produto.available and produto.compare_at_price and produto.compare_at_price > produto.price %}
-            <div class="produto-card">
-              {% assign diff = produto.compare_at_price | minus: produto.price %}
-              {% assign desconto = diff | times: 100 | divided_by: produto.compare_at_price | floor %}
-              {% assign produtos_em_promocao = produtos_em_promocao | plus: 1 %}
+      {%- comment -%} Primeiro: produtos em promoção (disponíveis com compare_at_price > price) {%- endcomment -%}
+      {% for produto in colecao.products limit: 12 %}
+        {%- assign p_price = produto.price -%}
+        {%- assign p_compare = produto.compare_at_price -%}
+        {%- assign p_available = produto.available -%}
+        {%- assign is_promo = false -%}
+        {%- if p_available and p_compare and p_compare > p_price -%}
+          {%- assign is_promo = true -%}
+        {%- endif -%}
+
+        {% if is_promo %}
+          {%- assign diff = p_compare | minus: p_price -%}
+          {%- assign desconto = diff | times: 100 | divided_by: p_compare | floor -%}
+          {%- assign produtos_em_promocao = produtos_em_promocao | plus: 1 -%}
+          {%- assign p_img = produto.featured_image -%}
+          <div class="produto-card">
+            <span class="badge-promocao">Em promoção</span>
+            {% if p_img %}
+              {{
+                p_img
+                | image_url: width: 300
+                | image_tag:
+                  alt: produto.title,
+                  width: p_img.width,
+                  height: p_img.height,
+                  loading: 'lazy'
+              }}
+            {% endif %}
+            <h3>{{ produto.title | capitalize }}</h3>
+            <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
+            <p class="preco">
+              {{ p_price | money }}
+              <span class="preco-original"><s>{{ p_compare | money }}</s> - {{ desconto }}%</span>
+            </p>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      {%- comment -%} Depois: os demais produtos (inclui esgotados e disponíveis sem promoção) {%- endcomment -%}
+      {% for produto in colecao.products limit: 12 %}
+        {%- assign p_price = produto.price -%}
+        {%- assign p_compare = produto.compare_at_price -%}
+        {%- assign p_available = produto.available -%}
+        {%- assign is_promo = false -%}
+        {%- if p_available and p_compare and p_compare > p_price -%}
+          {%- assign is_promo = true -%}
+        {%- endif -%}
+
+        {% unless is_promo %}
+          {%- assign p_img = produto.featured_image -%}
+          <div class="produto-card">
+            {% if p_available == false %}
+              <span class="badge-esgotado">Esgotado</span>
+            {% elsif p_compare and p_compare > p_price %}
+              {%- assign diff = p_compare | minus: p_price -%}
+              {%- assign desconto = diff | times: 100 | divided_by: p_compare | floor -%}
               <span class="badge-promocao">Em promoção</span>
+            {% else %}
+              <span class="badge-disponivel">Disponível</span>
+            {% endif %}
 
-              <img src="{{ produto.featured_image | image_url: width: 300 }}" alt="{{ produto.title }}" width="300" height="300">
-              <h3>{{ produto.title | capitalize }}</h3>
-              <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
-              <p class="preco">
-                {{ produto.price | money }}
-                <span class="preco-original"><s>{{ produto.compare_at_price | money }}</s> - {{ desconto }}%</span>
-              </p>
-            </div>
-          {% endif %}
-        {% endfor %}
-
-        {%- comment -%} Depois: os demais produtos (inclui esgotados e disponíveis sem promoção) {%- endcomment -%}
-        {% for produto in colecao.products %}
-          {% unless produto.available and produto.compare_at_price and produto.compare_at_price > produto.price %}
-            <div class="produto-card">
-              {% comment %} Badges: esgotado > promocao > disponivel {% endcomment %}
-              {% if produto.available == false %}
-                <span class="badge-esgotado">Esgotado</span>
-              {% elsif produto.compare_at_price and produto.compare_at_price > produto.price %}
-                {% assign diff = produto.compare_at_price | minus: produto.price %}
-                {% assign desconto = diff | times: 100 | divided_by: produto.compare_at_price | floor %}
-                <span class="badge-promocao">Em promoção</span>
-              {% else %}
-                <span class="badge-disponivel">Disponível</span>
+            {% if p_img %}
+              {{
+                p_img
+                | image_url: width: 300
+                | image_tag:
+                  alt: produto.title,
+                  width: p_img.width,
+                  height: p_img.height,
+                  loading: 'lazy'
+              }}
+            {% endif %}
+            <h3>{{ produto.title | capitalize }}</h3>
+            <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
+            <p class="preco">
+              {{ p_price | money }}
+              {% if p_compare and p_compare > p_price %}
+                <span class="preco-original"><s>{{ p_compare | money }}</s> - {{ desconto }}%</span>
               {% endif %}
+            </p>
+          </div>
+        {% endunless %}
+      {% endfor %}
+    </div>
 
-              <img src="{{ produto.featured_image | image_url: width: 300 }}" alt="{{ produto.title }}" width="300" height="300">
-              <h3>{{ produto.title | capitalize }}</h3>
-              <p class="descricao">{{ produto.description | strip_html | truncate: 100 }}</p>
-              <p class="preco">
-                {{ produto.price | money }}
-                {% if produto.compare_at_price and produto.compare_at_price > produto.price %}
-                  <span class="preco-original"><s>{{ produto.compare_at_price | money }}</s> - {{ desconto }}%</span>
-                {% endif %}
-              </p>
-            </div>
-          {% endunless %}
-        {% endfor %}
-        </div>
+    {%- assign resumo_titulo = colecao.title -%}
+    {%- capture resumo -%}
+      A coleção "{{ resumo_titulo }}" tem {{ colecao_total }} produtos, sendo {{ produtos_em_promocao }} em promoção.
+    {%- endcapture -%}
 
-        {% capture resumo %}
-          A coleção "{{ colecao.title }}" tem {{ colecao.products.size }} produtos, sendo {{ produtos_em_promocao }} em promoção.
-        {% endcapture %}
-
-        <p class="resumo">{{ resumo }}</p>
+    <p class="resumo">{{ resumo }}</p>
 
   {% else %}
     <p class="sem-colecao">
