@@ -1,0 +1,200 @@
+{% schema %}
+{
+  "name": "Grade de Produtos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "titulo",
+      "label": "Título da seção",
+      "default": "Nossos Produtos"
+    },
+    {
+      "type": "range",
+      "id": "titulo_tamanho",
+      "label": "Tamanho da fonte do título (px)",
+      "min": 14,
+      "max": 48,
+      "step": 1,
+      "default": 28
+    },
+    {
+      "type": "select",
+      "id": "titulo_posicao",
+      "label": "Posição do título",
+      "options": [
+        { "value": "left", "label": "Esquerda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Direita" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "collection",
+      "id": "colecao",
+      "label": "Coleção"
+    },
+    {
+      "type": "range",
+      "id": "colunas",
+      "label": "Colunas",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "limite",
+      "label": "Máximo de produtos",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Exibir badges de promoção",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "cor_fundo",
+      "label": "Cor de fundo da seção",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Grade de Produtos"
+    }
+  ]
+}
+{% endschema %}
+
+{{ 'component-product-card.css' | asset_url | stylesheet_tag }}
+
+<section
+  class="product-grid"
+  style="background-color: {{ section.settings.cor_fundo }}"
+>
+  {% if section.settings.titulo != blank %}
+    <h2 class="product-grid__titulo" style="text-align: {{ section.settings.titulo_posicao }}; font-size: {{ section.settings.titulo_tamanho }}px;">
+      {{ section.settings.titulo }}
+    </h2>
+  {% endif %}
+
+  {% if section.settings.colecao != blank %}
+    {%- assign colecao = section.settings.colecao -%}
+    {%- if colecao.products == blank -%}
+      {%- assign colecao = collections[section.settings.colecao] -%}
+    {%- endif -%}
+    {%- assign limite = section.settings.limite -%}
+    {%- assign show_badge = section.settings.show_badge -%}
+
+    <div
+      class="product-grid__container"
+      style="--colunas: {{ section.settings.colunas }}"
+    >
+      {% for product in colecao.products limit: limite %}
+        {%- if forloop.index <= section.settings.colunas -%}
+          {%- assign card_lazy = false -%}
+        {%- else -%}
+          {%- assign card_lazy = true -%}
+        {%- endif -%}
+        {% render 'product-card',
+          product: product,
+          show_badge: show_badge,
+          lazy: card_lazy
+        %}
+      {% endfor %}
+    </div>
+
+    {% if colecao.all_products_count > limite %}
+      <div class="product-grid__ver-mais">
+        <a href="{{ colecao.url }}" class="product-grid__link">
+          Ver todos os {{ colecao.all_products_count }} produtos
+        </a>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <p class="product-grid__vazio">
+      Selecione uma coleção nas configurações da seção.
+    </p>
+  {% endif %}
+</section>
+
+<style>
+  .product-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    /* animação de fade-in ao carregar a seção */
+    opacity: 0;
+    transform: translateY(10px);
+    animation: product-grid-fade 0.6s ease-out forwards;
+  }
+
+  .product-grid__titulo {
+    margin-bottom: 2rem;
+  }
+
+  .product-grid__container {
+    display: grid;
+    grid-template-columns: repeat(var(--colunas), 1fr);
+    gap: 1.5rem;
+  }
+
+  .product-grid__ver-mais {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .product-grid__link {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border: 2px solid #333;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+
+  .product-grid__link:hover {
+    background-color: #333;
+    color: white;
+  }
+
+  .product-grid__vazio {
+    text-align: center;
+    color: #999;
+    padding: 2rem;
+  }
+
+  /* Responsivo */
+
+  @media (max-width: 768px) {
+    .product-grid__container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-grid__container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @keyframes product-grid-fade {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

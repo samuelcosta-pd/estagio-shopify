@@ -1,0 +1,165 @@
+{% comment %} sections/product-extra-info.liquid {% endcomment %}
+{{ 'section-product-extra-info.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "Informações Extras",
+  "settings": [
+    {
+      "type": "text",
+      "id": "titulo",
+      "label": "Título da seção",
+      "default": "Informações do Produto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Informações Extras"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}
+
+{% if product %}
+  {% assign material = product.metafields.custom.material.value %}
+  {% assign cuidados = product.metafields.custom.instrucoes_cuidado.value %}
+  {% assign video = product.metafields.custom.video_url.value %}
+  
+  {% assign prazo_envio = product.metafields.custom.prazo_de_envio.value %}
+  {% assign avaliacao = product.metafields.custom.avaliacao_torcida.value %}
+  {% assign desconto_pix = product.metafields.custom.desconto_pix.value %}
+{% endif %}
+
+{% assign editor_preview = false %}
+{% if request.design_mode and material == blank and cuidados == blank and video == blank and prazo_envio == blank and avaliacao == blank and desconto_pix == blank %}
+  {% assign editor_preview = true %}
+{% endif %}
+
+{% if material != blank or cuidados != blank or video != blank or prazo_envio != blank or avaliacao != blank or desconto_pix != blank or editor_preview %}
+
+<section class="product-extra-info page-width">
+  <div class="product-extra-info__wrapper">
+
+    <h2 class="product-extra-info__title">
+      {{ section.settings.titulo }}
+    </h2>
+
+    {% if editor_preview %}
+      <p class="product-extra-info__hint">
+        Preencha os metafields do produto para exibir o conteúdo real aqui. Esta é apenas uma prévia do editor.
+      </p>
+    {% endif %}
+
+    {% if avaliacao != blank or prazo_envio != blank or desconto_pix != blank or editor_preview %}
+      <div class="product-extra-info__badges-row">
+        
+        {% comment %} Badge de Classificação Integrado {% endcomment %}
+        {% if avaliacao != blank or editor_preview %}
+          <div class="product-extra-info__badge-item product-extra-info__badge-item--rating">
+            <span class="product-extra-info__star-icon">⭐</span>
+            <span>
+              {% if avaliacao != blank %}
+                <strong>{{ avaliacao.rating }}</strong>/{{ avaliacao.scale_max }}
+              {% else %}
+                <strong>4.9</strong>/5
+              {% endif %}
+              (Avaliação da Torcida)
+            </span>
+          </div>
+        {% endif %}
+
+        {% if prazo_envio != blank or editor_preview %}
+          <div class="product-extra-info__badge-item">
+            <span class="product-extra-info__badge-icon">🚚</span>
+            <span><strong>Prazo:</strong> {{ prazo_envio | default: "Envio Imediato" }}</span>
+          </div>
+        {% endif %}
+
+        {% if desconto_pix != blank or editor_preview %}
+          <div class="product-extra-info__badge-item product-extra-info__badge-item--highlight">
+            <span class="product-extra-info__badge-icon">⚡</span>
+            <span>
+              {% if desconto_pix != blank %}
+                Ganhe {{ desconto_pix | money }} de desconto no Pix!
+              {% else %}
+                <strong>Pix:</strong> Ganhe R$ 20,00 de desconto
+              {% endif %}
+            </span>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if material != blank or editor_preview %}
+      <div class="product-extra-info__card">
+        <div class="product-extra-info__row">
+          <span class="product-extra-info__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3l2 2h4l2-2 4 4-3 3v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V10L2 7l4-4z" />
+              <path d="M9 13h6" />
+              <path d="M9 17h6" />
+            </svg>
+          </span>
+          <div>
+            <strong>Material</strong>
+            <p>{{ material | default: "Ex.: 100% Poliéster Premium" }}</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if cuidados != blank or editor_preview %}
+      <details class="product-extra-info__accordion">
+        <summary>
+          <span class="product-extra-info__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3c2.5 3 5 6.2 5 9.5a5 5 0 0 1-10 0C7 9.2 9.5 6 12 3z" />
+            </svg>
+          </span>
+          <span>Instruções de cuidado</span>
+        </summary>
+
+        <div class="product-extra-info__content">
+          {% if cuidados != blank %}
+            {{ cuidados | metafield_tag }}
+          {% else %}
+            <p>Ex.: Lavar à mão, não secar à máquina para preservar o patch oficial.</p>
+          {% endif %}
+        </div>
+      </details>
+    {% endif %}
+
+    {% if video != blank %}
+      {% assign embed_url = video
+        | replace: "https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/"
+        | replace: "https://youtu.be/", "https://www.youtube.com/embed/"
+        | replace: "https://vimeo.com/", "https://player.vimeo.com/video/"
+      %}
+      <div class="product-extra-info__video">
+        <iframe
+          src="{{ embed_url }}"
+          title="Vídeo do produto"
+          loading="lazy"
+          allowfullscreen
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+        </iframe>
+      </div>
+    {% elsif editor_preview %}
+      <div class="product-extra-info__video product-extra-info__video--empty">
+        <span class="product-extra-info__icon product-extra-info__icon--lg" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="5.5" width="14" height="13" rx="2" />
+            <path d="M16.5 10.5l5-3v9l-5-3z" />
+          </svg>
+        </span>
+        <p>Nenhum vídeo cadastrado no metafield "video_url".</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endif %}

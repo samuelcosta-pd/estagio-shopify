@@ -1,0 +1,144 @@
+{% comment %}
+  Snippet: Product Card
+
+  Uso:
+  {% render 'product-card', product: product, show_badge: true, image_width: 400, lazy: true %}
+
+  Parâmetros:
+  - product: objeto do produto (obrigatório)
+  - show_badge: exibir badge de promoção (opcional, default: true)
+  - image_width: largura da imagem (opcional, default: 400)
+  - lazy: usar lazy loading na imagem (opcional, default: true)
+{% endcomment %}
+
+{%- assign largura = image_width | default: 400 -%}
+{%- assign show_badge = show_badge | default: true -%}
+{%- if lazy == false -%}
+  {%- assign card_loading = 'eager' -%}
+{%- else -%}
+  {%- assign card_loading = 'lazy' -%}
+{%- endif -%}
+
+{%- assign p_url = product.url -%}
+{%- assign p_title = product.title | escape -%}
+{%- assign p_price = product.price -%}
+{%- assign p_compare_at_price = product.compare_at_price -%}
+{%- assign p_available = product.available -%}
+{%- assign has_discount = false -%}
+{%- if p_compare_at_price and p_compare_at_price > p_price -%}
+  {%- assign has_discount = true -%}
+{%- endif -%}
+
+<div class="product-card">
+  <div class="product-card__media">
+    {% if show_badge %}
+      {% if p_available == false %}
+        <span class="product-card__badge product-card__badge--sold">Esgotado</span>
+      {% elsif has_discount %}
+        {% assign desconto = p_compare_at_price | minus: p_price | times: 100 | divided_by: p_compare_at_price | round %}
+        <span class="product-card__badge">-{{ desconto }}%</span>
+      {% endif %}
+    {% endif %}
+
+    {%- assign p_img = product.featured_image -%}
+    {% if p_img %}
+      <a href="{{ p_url }}">
+        {{
+          p_img
+          | image_url: width: largura
+          | image_tag:
+            alt: p_title,
+            class: 'product-card__image',
+            width: p_img.width,
+            height: p_img.height,
+            loading: card_loading
+        }}
+      </a>
+    {% else %}
+      {% capture placeholder_svg %}
+        <svg xmlns='http://www.w3.org/2000/svg' width='{{ largura }}' height='{{ largura }}' viewBox='0 0 {{ largura }} {{ largura }}'>
+          <rect width='100%' height='100%' fill='#efefef' />
+          <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#aaa' font-family='Arial, Helvetica, sans-serif' font-size='{{ largura | divided_by: 10 }}'>Sem imagem</text>
+        </svg>
+      {% endcapture %}
+
+      <a href="{{ p_url }}">
+        <img src="data:image/svg+xml;utf8,{{ placeholder_svg | url_encode }}" alt="{{ p_title }}" class="product-card__image" width="{{ largura }}" height="{{ largura }}" loading="lazy" />
+      </a>
+    {% endif %}  {%- comment -%} /if p_img {%- endcomment -%}
+  </div>
+
+  <div class="product-card__content">
+    <h3 class="product-card__title"><a href="{{ p_url }}" title="{{ p_title }}">{{ p_title }}</a></h3>
+
+    {%- comment -%} Render color variants as swatches if product has a color option {%- endcomment -%}
+    {%- assign color_option = nil -%}
+    {%- assign color_option_position = 0 -%}
+    {%- for opt in product.options_with_values -%}
+      {%- assign name_down = opt.name | downcase -%}
+      {%- if name_down contains 'color' or name_down contains 'cor' -%}
+        {%- assign color_option = opt -%}
+        {%- assign color_option_position = forloop.index -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {% if color_option and color_option.values.size > 0 %}
+      <div class="product-card__swatches" aria-hidden="true">
+        {% for v in color_option.values limit:6 %}
+          {% assign v_trim = v | strip %}
+
+          {%- comment -%} Find a variant that matches this color value to link directly to it {% endcomment -%}
+          {%- assign variant_id = nil -%}
+          {%- assign variant_available = true -%}
+
+          {%- assign variant = nil -%}
+          {%- if color_option_position == 1 -%}
+            {%- assign variant = product.variants | where: 'option1', v_trim | first -%}
+          {%- elsif color_option_position == 2 -%}
+            {%- assign variant = product.variants | where: 'option2', v_trim | first -%}
+          {%- elsif color_option_position == 3 -%}
+            {%- assign variant = product.variants | where: 'option3', v_trim | first -%}
+          {%- endif -%}
+
+          {%- if variant -%}
+            {%- assign variant_id = variant.id -%}
+            {%- assign variant_available = variant.available -%}
+          {%- endif -%}
+
+          {%- comment -%} If value looks like a hex code, use it directly; otherwise try as color name {% endcomment -%}
+          {% if v_trim contains '#' %}
+            {% assign swatch_color = v_trim %}
+          {% else %}
+            {% assign swatch_color = v_trim | downcase %}
+          {% endif %}
+
+          {% if variant_id %}
+            <a href="{{ p_url }}?variant={{ variant_id }}" class="product-card__swatch-link" title="{{ v_trim | escape }}" aria-label="{{ v_trim | escape }}">
+              <span class="product-card__swatch{% unless variant_available %} product-card__swatch--sold{% endunless %}" style="background-color: {{ swatch_color }}"></span>
+            </a>
+          {% else %}
+            <span class="product-card__swatch" title="{{ v_trim | escape }}" style="background-color: {{ swatch_color }}"></span>
+          {% endif %}
+
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="product-card__actions">
+      <div>
+        <span class="product-card__preco">{{ p_price | money }}</span>
+        {% if has_discount %}
+          <span class="product-card__preco--original">{{ p_compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+
+      {% if p_available == false %}
+        <button class="product-card__btn disabled" disabled>Indisponível</button>
+      {% else %}
+        <a href="{{ p_url }}" class="product-card__btn">Adicionar ao carrinho</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+ 

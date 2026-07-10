@@ -1,0 +1,101 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero_banner_P8nPPj": {
+      "type": "hero-banner",
+      "blocks": {
+        "heading_kT4mPg": {
+          "type": "heading",
+          "settings": {
+            "texto_titulo": "A sua loja do HEXA!",
+            "tamanho_titulo": "h1",
+            "cor_titulo": "#FFFFFF"
+          }
+        },
+        "image_hgWMG8": {
+          "type": "image",
+          "settings": {
+            "imagem": "shopify://shop_images/camisa-brasil-12.webp",
+            "largura_maxima": 200,
+            "alt_text": ""
+          }
+        },
+        "button_6TYQJD": {
+          "type": "button",
+          "settings": {
+            "texto_botao": "Cupom 50% OFF",
+            "link_botao": "",
+            "estilo_botao": "primary"
+          }
+        },
+        "paragraph_7QhjJ3": {
+          "type": "paragraph",
+          "settings": {
+            "conteudo_paragrafo": "<p>Produtos oficiais da seleção Brasileira Feminina de Futebol.</p>",
+            "cor_paragrafo": "#FFFFFF"
+          }
+        }
+      },
+      "block_order": [
+        "heading_kT4mPg",
+        "image_hgWMG8",
+        "button_6TYQJD",
+        "paragraph_7QhjJ3"
+      ],
+      "name": "Hero Banner",
+      "settings": {
+        "imagem_fundo": "shopify://shop_images/capa_760ba705-0cb6-4528-9ff4-3e0060198c61.webp",
+        "cor_overlay": "#000000",
+        "opacidade_overlay": 40,
+        "altura_minima": 500,
+        "alinhamento": "center"
+      }
+    },
+    "exercicio_liquid_basico_Ukk8FW": {
+      "type": "exercicio-liquid-basico",
+      "name": "Exercício Liquid Básico",
+      "settings": {
+        "titulo": "Bem-vindo à nossa loja",
+        "descricao": "<p>Aqui você encontra os melhores produtos.</p>",
+        "quantidade_produtos": 4,
+        "layout": "grid",
+        "bg_color": "#ffffff"
+      }
+    },
+    "exercicio_product_grid_3pEQPQ": {
+      "type": "exercicio-product-grid",
+      "name": "Grade de Produtos",
+      "settings": {
+        "titulo": "Nossos Produtos",
+        "titulo_tamanho": 28,
+        "titulo_posicao": "center",
+        "colecao": "automated-collection",
+        "colunas": 3,
+        "limite": 6,
+        "show_badge": true,
+        "cor_fundo": "#ffffff"
+      }
+    },
+    "exercicio_filtros_7KrLiR": {
+      "type": "exercicio-filtros",
+      "name": "Exercício Filtros Liquid",
+      "settings": {
+        "colecao": "automated-collection"
+      }
+    }
+  },
+  "order": [
+    "hero_banner_P8nPPj",
+    "exercicio_liquid_basico_Ukk8FW",
+    "exercicio_product_grid_3pEQPQ",
+    "exercicio_filtros_7KrLiR"
+  ]
+}

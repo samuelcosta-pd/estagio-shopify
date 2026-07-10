@@ -1,0 +1,169 @@
+/* assets/section-product-extra-info.css */
+.product-extra-info {
+  margin-top: 48px;
+}
+
+.product-extra-info__wrapper {
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: 24px;
+  background: #fff;
+}
+
+.product-extra-info__title {
+  margin: 0 0 24px;
+}
+
+.product-extra-info__hint {
+  margin: -8px 0 20px;
+  padding: 10px 14px;
+  background: #fff8e1;
+  border: 1px solid #f0d98c;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #6b5900;
+}
+
+/* Badges da Copa */
+.product-extra-info__badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.product-extra-info__badge-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 14px;
+  color: #121212;
+}
+
+.product-extra-info__badge-item--highlight {
+  background: rgba(46, 204, 113, 0.1);
+  border-color: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.product-extra-info__badge-icon {
+  font-size: 16px;
+}
+
+.product-extra-info__badge-item--rating {
+  background-color: rgba(241, 196, 15, 0.08);
+  border-color: rgba(241, 196, 15, 0.2);
+}
+
+.product-extra-info__star-icon {
+  font-size: 14px;
+}
+
+.product-extra-info__card {
+  padding: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.product-extra-info__row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.product-extra-info__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #1a1a1a;
+}
+
+.product-extra-info__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.product-extra-info__icon--lg {
+  width: 32px;
+  height: 32px;
+  color: #999;
+}
+
+.product-extra-info__row p {
+  margin: 4px 0 0;
+}
+
+.product-extra-info__accordion {
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.product-extra-info__accordion summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  padding: 16px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.product-extra-info__accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.product-extra-info__content {
+  padding: 0 16px 16px;
+}
+
+.product-extra-info__video {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.product-extra-info__video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.product-extra-info__video--empty {
+  position: static;
+  height: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #f4f4f4;
+  color: #666;
+  text-align: center;
+}
+
+.product-extra-info__video--empty p {
+  margin: 0;
+}
+
+/* Ajuste Responsivo */
+@media screen and (max-width: 749px) {
+  .product-extra-info__badges-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
